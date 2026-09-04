@@ -1,0 +1,122 @@
+/*
+  Hanie OS design tokens — visual foundation from references/about/screenShot-reference.png
+  Living Desktop V1 uses CSS-only atmospheric backgrounds (no os-background.png).
+*/
+
+:root {
+  /* ——— Surfaces / background ——— */
+  --os-bg: #030816;
+  --os-bg-deep: #01040e;
+  --os-bg-elevated: #0a1228;
+  --os-surface: rgba(10, 16, 36, 0.72);
+  --os-surface-strong: rgba(8, 12, 28, 0.88);
+
+  /* ——— Text ——— */
+  --os-text: #f5f7ff;
+  --os-text-muted: #b8bed4;
+  --os-text-subtle: #8e95b0;
+  --os-text-inverse: #0b1020;
+
+  /* ——— Accents (neon / glass UI) ——— */
+  --os-accent: #a855f7;
+  --os-accent-strong: #d946ef;
+  --os-accent-soft: rgba(168, 85, 247, 0.22);
+  --os-accent-glow: rgba(168, 85, 247, 0.45);
+  --os-cyan: #22d3ee;
+  --os-pink: #f472b6;
+  --os-green: #4ade80;
+  --os-terminal: #86efac;
+  --os-danger: #f43f5e;
+  --os-warning: #fbbf24;
+  --os-note: #fde68a;
+  --os-status: #34d399;
+
+  /* ——— Gradients ——— */
+  --os-gradient-accent: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #a855f7 45%,
+    #d946ef 100%
+  );
+  --os-gradient-desktop: linear-gradient(
+    180deg,
+    #0b1230 0%,
+    #070b1c 38%,
+    #040612 68%,
+    #01040e 100%
+  );
+
+  /* ——— Borders ——— */
+  --os-border: rgba(255, 255, 255, 0.12);
+  --os-border-strong: rgba(196, 181, 253, 0.28);
+  --os-border-accent: rgba(168, 85, 247, 0.45);
+
+  /* ——— Glass ——— */
+  --os-glass-bg: rgba(8, 12, 28, 0.89);
+  --os-glass-bg-strong: rgba(6, 10, 24, 0.92);
+  --os-glass-blur: 20px;
+  --os-glass-saturate: 1.2;
+  --os-menubar-bg: rgba(6, 10, 22, 0.45);
+  --os-dock-bg: rgba(8, 12, 28, 0.62);
+
+  /* ——— Shadows ——— */
+  --os-shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --os-shadow-window: 0 24px 80px rgba(0, 0, 0, 0.55),
+    0 2px 0 rgba(255, 255, 255, 0.04) inset;
+  --os-shadow-dock: 0 12px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  --os-shadow-glow: 0 0 24px var(--os-accent-glow);
+  --os-shadow-glow-strong: 0 0 36px rgba(217, 70, 239, 0.55);
+
+  /* ——— Radius ——— */
+  --os-radius-sm: 0.5rem;
+  --os-radius-md: 0.75rem;
+  --os-radius-lg: 1rem;
+  --os-radius-xl: 1.25rem;
+  --os-radius-pill: 9999px;
+
+  /* ——— Spacing scale ——— */
+  --os-space-1: 0.25rem;
+  --os-space-2: 0.5rem;
+  --os-space-3: 0.75rem;
+  --os-space-4: 1rem;
+  --os-space-5: 1.5rem;
+  --os-space-6: 2rem;
+  --os-space-7: 2.5rem;
+  --os-space-8: 3rem;
+
+  /* ——— Shell layout ——— */
+  --os-menubar-height: 1.5rem;
+  --os-dock-offset: 1rem;
+  --os-dock-height: 5.5rem;
+
+  /* ——— Typography ——— */
+  --os-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --os-font-handwritten: var(--font-caveat), "Comic Sans MS", cursive;
+  --os-font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --os-font-mono: ui-monospace, "SFMono-Regular", menlo, monaco, consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --os-text-xs: 0.75rem;
+  --os-text-sm: 0.875rem;
+  --os-text-base: 1rem;
+  --os-text-lg: 1.125rem;
+  --os-text-xl: 1.25rem;
+  --os-text-2xl: 1.5rem;
+  --os-text-3xl: 1.875rem;
+  --os-leading-tight: 1.25;
+  --os-leading-snug: 1.375;
+  --os-leading-normal: 1.5;
+  --os-tracking-tight: -0.02em;
+  --os-tracking-wide: 0.08em;
+  --os-tracking-wider: 0.2em;
+
+  /* ——— Z-index scale ——— */
+  --os-z-desktop: 0;
+  --os-z-window: 10;
+  --os-z-dock: 40;
+  --os-z-menubar: 50;
+  --os-z-overlay: 60;
+
+  --background: var(--os-bg);
+  --foreground: var(--os-text);
+}
