@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  calculateViewportAwarePosition,
   clampWindowPosition,
   getDesktopAreaSize,
 } from "./window/geometry";
@@ -32,10 +33,18 @@ type DragSession = {
   latestY: number;
 };
 
-export function DesktopWidget({ id, children, initialBounds }: DesktopWidgetProps) {
+export function DesktopWidget({
+  id,
+  children,
+  initialBounds,
+}: DesktopWidgetProps) {
   const frameRef = useRef<HTMLElement>(null);
   const dragRef = useRef<DragSession | null>(null);
-  const [bounds, setBounds] = useState(initialBounds);
+  const [bounds, setBounds] = useState(() => {
+    if (typeof window === "undefined") return initialBounds;
+    const area = getDesktopAreaSize();
+    return calculateViewportAwarePosition(initialBounds, area, initialBounds);
+  });
   const [isCompact, setIsCompact] = useState(false);
 
   useEffect(() => {
@@ -72,7 +81,7 @@ export function DesktopWidget({ id, children, initialBounds }: DesktopWidgetProp
           width: drag.width,
           height: drag.height,
         },
-        getDesktopAreaSize(),
+        getDesktopAreaSize()
       );
 
       drag.latestX = next.x;
@@ -117,7 +126,7 @@ export function DesktopWidget({ id, children, initialBounds }: DesktopWidgetProp
     const onPointerDownCapture = (event: Event) => {
       const pointerEvent = event as PointerEvent;
       const target = pointerEvent.target as HTMLElement | null;
-      
+
       if (!target?.closest(".os-widget")) return;
       if (pointerEvent.button !== 0) return;
       if (target.closest("button")) return;

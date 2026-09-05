@@ -21,24 +21,24 @@ export function DesktopHero() {
 
       <DesktopWidget
         id="terminal-widget"
-        initialBounds={{ x: 950, y: 8, width: 275, height: 410 }}
+        initialBounds={{ x: 2000, y: 420, width: 450, height: 145 }}
       >
         <TerminalWindowContent />
       </DesktopWidget>
 
       <DesktopWidget
         id="system-stats-widget"
-        initialBounds={{ x: 520, y: 8, width: 400, height: 230 }}
+        initialBounds={{ x: 10, y: 300, width: 300, height: 360 }}
       >
         <SystemStatsWindowContent />
       </DesktopWidget>
 
-      <DesktopWidget
+      {/* <DesktopWidget
         id="sticky-widget"
         initialBounds={{ x: 950, y: 430, width: 250, height: 160 }}
       >
         <StickyNoteWindowContent />
-      </DesktopWidget>
+      </DesktopWidget> */}
     </>
   );
 }
