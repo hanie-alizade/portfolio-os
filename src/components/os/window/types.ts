@@ -29,6 +29,7 @@ export type WindowManagerSnapshot = {
   windowOrder: WindowId[];
   focusedId: WindowId | null;
   topZ: number;
+  pendingPayloads: Partial<Record<WindowId, unknown>>;
 };
 
 export type CreateWindowInput = {

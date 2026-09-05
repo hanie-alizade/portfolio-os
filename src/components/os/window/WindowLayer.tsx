@@ -2,9 +2,10 @@
 
 import type { ReactNode } from "react";
 import { AboutWindowContent } from "@/components/os/windows/AboutWindowContent";
+import { CaseStudiesWindowContent } from "@/components/os/windows/CaseStudiesWindowContent";
 import { ContactWindowContent } from "@/components/os/windows/ContactWindowContent";
 import { ExperienceWindowContent } from "@/components/os/windows/ExperienceWindowContent";
-import { NdaVaultWindowContent } from "@/components/os/windows/NdaVaultWindowContent";
+import { NdaWindowContent } from "@/components/os/windows/NdaWindowContent";
 import { PlaceholderWindowContent } from "@/components/os/windows/PlaceholderWindowContent";
 import { ResumeWindowContent } from "@/components/os/windows/ResumeWindowContent";
 import { WindowFrame } from "./WindowFrame";
@@ -18,7 +19,9 @@ function renderWindowContent(id: WindowId, title: string): ReactNode {
     case "experience":
       return <ExperienceWindowContent />;
     case "nda":
-      return <NdaVaultWindowContent />;
+      return <NdaWindowContent />;
+    case "case-studies":
+      return <CaseStudiesWindowContent />;
     case "contact":
       return <ContactWindowContent />;
     case "resume":
