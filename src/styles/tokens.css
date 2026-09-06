@@ -13,6 +13,7 @@
 
   /* ——— Text ——— */
   --os-text: #f5f7ff;
+  --os-text-subtitle: #dccbff;
   --os-text-muted: #b8bed4;
   --os-text-subtle: #8e95b0;
   --os-text-inverse: #0b1020;
@@ -20,7 +21,9 @@
   /* ——— Accents (neon / glass UI) ——— */
   --os-accent: #a855f7;
   --os-accent-strong: #d946ef;
+  --os-accent-strong-light: #f1c3ff;
   --os-accent-soft: rgba(168, 85, 247, 0.22);
+  --os-accent-border: rgba(169, 85, 247, 0.808);
   --os-accent-glow: rgba(168, 85, 247, 0.45);
   --os-cyan: #22d3ee;
   --os-pink: #f472b6;
@@ -49,9 +52,12 @@
   /* ——— Borders ——— */
   --os-border: rgba(255, 255, 255, 0.12);
   --os-border-strong: rgba(196, 181, 253, 0.28);
+  --os-border-light: rgba(195, 181, 253, 0.438);
   --os-border-accent: rgba(168, 85, 247, 0.45);
+  --os-border-accent2: rgba(123, 80, 243, 0.45);
 
   /* ——— Glass ——— */
+  --os-glass-bg-widget: rgba(8, 12, 28, 0.548);
   --os-glass-bg: rgba(8, 12, 28, 0.89);
   --os-glass-bg-strong: rgba(6, 10, 24, 0.92);
   --os-glass-blur: 20px;
@@ -73,6 +79,7 @@
   --os-radius-md: 0.75rem;
   --os-radius-lg: 1rem;
   --os-radius-xl: 1.25rem;
+  --os-radius-dock: 1.75rem;
   --os-radius-pill: 9999px;
 
   /* ——— Spacing scale ——— */
@@ -87,15 +94,15 @@
 
   /* ——— Shell layout ——— */
   --os-menubar-height: 1.5rem;
-  --os-dock-offset: 1rem;
+  --os-dock-offset: 0.5rem;
   --os-dock-height: 5.5rem;
 
   /* ——— Typography ——— */
   --os-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --os-font-handwritten: var(--font-caveat), "Comic Sans MS", cursive;
   --os-font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --os-font-mono: ui-monospace, "SFMono-Regular", menlo, monaco, consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --os-font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
+    menlo, monaco, consolas, monospace;
   --os-text-xs: 0.75rem;
   --os-text-sm: 0.875rem;
   --os-text-base: 1rem;

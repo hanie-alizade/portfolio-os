@@ -2,43 +2,66 @@
 
 import Image from "next/image";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
+import { useMenuBar } from "@/components/os/MenuBarContext";
+import { getDisplayedYearsOfExperience } from "@/lib/experience";
 
 const HIGHLIGHTS = [
-  "React",
-  "TypeScript",
-  "Next.js",
-  "UI Architecture",
-  "Performance",
+  { label: "React", accent: "var(--os-cyan)" },
+  { label: "TypeScript", accent: "var(--os-accent)" },
+  { label: "Next.js", accent: "var(--os-text)" },
+  { label: "Microfrontends", accent: "var(--os-pink)" },
+  { label: "Performance", accent: "var(--os-green)" },
 ] as const;
 
 export function AboutWindowContent() {
   const { openWindow } = useWindowManager();
+  const { openMenu } = useMenuBar();
+  const years = getDisplayedYearsOfExperience();
 
   return (
     <div className="os-window-content os-window-content--about">
-      <div className="os-window-content__copy">
+      <div className="os-window-content__copy ">
         <p className="os-eyebrow">Frontend Engineer</p>
         <h3 className="os-window-heading">
-          Hi, I&apos;m Hanie <span aria-hidden="true">👋</span>
+          I turn complex systems into interfaces people actually enjoy using.
         </h3>
-        <p className="os-window-copy">
-          I build polished, performant interfaces with React, TypeScript, and
-          Next.js — from scalable UI systems to interactive product experiences.
-        </p>
+        <div className="flex flex-col gap-1">
+          <p className="os-window-copy">
+            Senior Frontend Engineer with {years}+ years building production
+            interfaces.
+          </p>
+          <p className="os-window-copy">
+            From logistics dashboards handling 1,000+ orders a day, to wallet &
+            transaction flows, enterprise platforms, and healthcare tools.
+          </p>
+        </div>
         <div className="os-chip-row" aria-label="Key highlights">
           {HIGHLIGHTS.map((highlight) => (
-            <span key={highlight} className="os-chip">
-              {highlight}
+            <span
+              key={highlight.label}
+              className="os-chip"
+              style={
+                { "--chip-accent": highlight.accent } as React.CSSProperties
+              }
+            >
+              {highlight.label}
             </span>
           ))}
         </div>
+        <button
+          type="button"
+          className="os-link"
+          onClick={() => openMenu("skills")}
+        >
+          + full stack in the Skills menu ↗
+        </button>
         <div className="os-action-row">
           <button
             type="button"
             className="os-btn os-btn--primary"
             onClick={() => openWindow("resume")}
           >
-            Resume
+            RESUME.EXE
           </button>
           <button
             type="button"
@@ -49,6 +72,7 @@ export function AboutWindowContent() {
           </button>
         </div>
       </div>
+
       <div className="os-window-content__media os-window-content__media--plain">
         <Image
           src="/os/about-desktop.png"

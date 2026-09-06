@@ -1,3 +1,7 @@
+"use client";
+
+import { useWindowManager } from "@/components/os/window/WindowManagerContext";
+
 const EXPERIENCE = [
   {
     company: "Boxy",
@@ -8,7 +12,7 @@ const EXPERIENCE = [
       "Implemented role-based access control (5 roles, 20+ permissions) via a custom permission hook and wrapper component.",
       "Raised Lighthouse performance from 85 to 97 through caching, lazy loading, and memoization.",
       "Led an incremental UI migration from Ant Design to shadcn/ui, converting the platform page by page without pausing feature work.",
-      "Also built a schema-driven dynamic form system → full story in NDA Vault.",
+      "Also built a schema-driven dynamic form system.",
     ],
   },
   {
@@ -28,7 +32,8 @@ const EXPERIENCE = [
       "Built a permission-based UI system adopted across 50+ files to control access and visibility by role.",
       "Managed complex async state (multi-step API workflows, side effects) with Redux and Redux-Saga.",
       "Led code review and mentorship for a 6-person frontend team, including onboarding and technical interviews.",
-      "Also designed the platform's microfrontend architecture and a custom gRPC debug panel → full story in NDA Vault.",
+      "Also designed the platform's microfrontend architecture.",
+      "Also built a custom gRPC debug panel for the platform.",
     ],
   },
   {
@@ -38,11 +43,14 @@ const EXPERIENCE = [
     achievements: [
       "Built a PWA for a counseling platform with offline video playback and push notifications.",
       "Built the platform's marketing site in Next.js for SEO, alongside a React-based application panel.",
+      "Delivered pixel-perfect UI implementations consistently praised by the design team.",
     ],
   },
 ] as const;
 
 export function ExperienceWindowContent() {
+  const { openWindow } = useWindowManager();
+
   return (
     <div className="os-experience">
       <header className="os-experience__header">
@@ -64,9 +72,70 @@ export function ExperienceWindowContent() {
                 <span className="os-experience__period">{job.period}</span>
               </div>
               <ul className="os-experience__achievements">
-                {job.achievements.map((achievement) => (
-                  <li key={achievement}>{achievement}</li>
-                ))}
+                {job.achievements.map((achievement, idx) => {
+                  if (
+                    achievement ===
+                    "Also designed the platform's microfrontend architecture."
+                  ) {
+                    return (
+                      <li key={idx}>
+                        Also designed the platform's microfrontend architecture
+                        —{" "}
+                        <button
+                          type="button"
+                          className="os-experience__case-study-link"
+                          onClick={() =>
+                            openWindow("case-studies", { caseStudyId: "01" })
+                          }
+                          aria-label="View case study: Enterprise Microfrontend Architecture"
+                        >
+                          see the full case study →
+                        </button>
+                      </li>
+                    );
+                  }
+                  if (
+                    achievement ===
+                    "Also built a custom gRPC debug panel for the platform."
+                  ) {
+                    return (
+                      <li key={idx}>
+                        Also built a custom gRPC debug panel for the platform —{" "}
+                        <button
+                          type="button"
+                          className="os-experience__case-study-link"
+                          onClick={() =>
+                            openWindow("case-studies", { caseStudyId: "02" })
+                          }
+                          aria-label="View case study: Custom gRPC Debug Panel"
+                        >
+                          see the full case study →
+                        </button>
+                      </li>
+                    );
+                  }
+                  if (
+                    achievement ===
+                    "Also built a schema-driven dynamic form system."
+                  ) {
+                    return (
+                      <li key={idx}>
+                        Also built a schema-driven dynamic form system —{" "}
+                        <button
+                          type="button"
+                          className="os-experience__case-study-link"
+                          onClick={() =>
+                            openWindow("case-studies", { caseStudyId: "03" })
+                          }
+                          aria-label="View case study: Schema-Driven Dynamic Form System"
+                        >
+                          see the full case study →
+                        </button>
+                      </li>
+                    );
+                  }
+                  return <li key={idx}>{achievement}</li>;
+                })}
               </ul>
             </div>
           </article>

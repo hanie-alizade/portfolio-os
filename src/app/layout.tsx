@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Caveat, Inter } from "next/font/google";
+import { Geist, Caveat, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +17,12 @@ const caveat = Caveat({
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -60,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${caveat.variable} ${inter.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${caveat.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="h-full overflow-hidden font-sans">{children}</body>
     </html>
