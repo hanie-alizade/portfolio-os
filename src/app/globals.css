@@ -659,7 +659,9 @@ body {
   grid-template-columns: 1fr;
   align-items: stretch;
 }
-
+.os-window-content--about .os-window-content__media {
+  opacity: 0.75;
+}
 .os-window-content__copy {
   position: relative;
   z-index: 1;
