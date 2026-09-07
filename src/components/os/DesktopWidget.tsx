@@ -13,6 +13,7 @@ import {
   clampWindowPosition,
   getDesktopAreaSize,
 } from "./window/geometry";
+import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
 
 type DesktopWidgetProps = {
   id: string;
@@ -45,15 +46,7 @@ export function DesktopWidget({
     const area = getDesktopAreaSize();
     return calculateViewportAwarePosition(initialBounds, area, initialBounds);
   });
-  const [isCompact, setIsCompact] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsCompact(media.matches);
-    sync();
-    media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
-  }, []);
+  const isCompact = useIsCompactViewport();
 
   const applyTransform = useCallback((x: number, y: number) => {
     const node = frameRef.current;
@@ -180,6 +173,7 @@ export function DesktopWidget({
     : {
         width: bounds.width,
         height: bounds.height,
+        transform: `translate3d(${bounds.x}px, ${bounds.y}px, 0)`,
       };
 
   return (

@@ -28,7 +28,7 @@ export function DesktopHero() {
 
       <DesktopWidget
         id="system-stats-widget"
-        initialBounds={{ x: 10, y: 300, width: 300, height: 360 }}
+        initialBounds={{ x: 10, y: 350, width: 300, height: 360 }}
       >
         <SystemStatsWindowContent />
       </DesktopWidget>

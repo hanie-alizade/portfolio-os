@@ -297,6 +297,26 @@ function HelpMenu({
   );
 }
 
+function DynamicIsland() {
+  const { state } = useWindowManager();
+  const activeWindow = Object.values(state.windows).find(
+    (w) => w.isOpen && !w.isMinimized
+  );
+
+  return (
+    <div
+      className={`os-dynamic-island${
+        activeWindow ? " os-dynamic-island--active" : ""
+      }`}
+      aria-live="polite"
+    >
+      {activeWindow ? (
+        <span className="os-dynamic-island__label">{activeWindow.title}</span>
+      ) : null}
+    </div>
+  );
+}
+
 export function MenuBar() {
   const { activeMenu, openMenu, closeMenu } = useMenuBar();
   const { openWindow } = useWindowManager();
@@ -369,6 +389,10 @@ export function MenuBar() {
           />
           OPEN TO OPPORTUNITIES
         </p>
+      </div>
+
+      <div className="pointer-events-none absolute left-1/2 flex -translate-x-1/2 md:hidden">
+        <DynamicIsland />
       </div>
 
       <div className="flex shrink-0 items-center gap-os-2 sm:gap-os-3">

@@ -9,51 +9,9 @@ import {
   motion,
   type MotionValue,
 } from "motion/react";
-import type { DockAppId } from "@/components/os/appIds";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
-
-export type { DockAppId };
-
-type DockApp = { id: DockAppId; label: string; hint: string; icon: string };
-
-const dockApps: DockApp[] = [
-  {
-    id: "about",
-    label: "About",
-    hint: "This is me",
-    icon: "/os/dockIcons/about.png",
-  },
-  {
-    id: "experience",
-    label: "Experience",
-    hint: "My journey",
-    icon: "/os/dockIcons/experience.png",
-  },
-  {
-    id: "nda",
-    label: "NDA",
-    hint: "Locked work",
-    icon: "/os/dockIcons/nda.png",
-  },
-  {
-    id: "case-studies",
-    label: "Case Studies",
-    hint: "Deep dive",
-    icon: "/os/dockIcons/case-studies.png",
-  },
-  {
-    id: "resume",
-    label: "Resume",
-    hint: "Download CV",
-    icon: "/os/dockIcons/resume.png",
-  },
-  {
-    id: "contact",
-    label: "Contact",
-    hint: "Get in touch",
-    icon: "/os/dockIcons/contact.png",
-  },
-];
+import type { DockApp } from "./dockApps";
+import { dockApps } from "./dockApps";
 
 const BASE_SIZE = 44;
 const MAX_SIZE = 68;
