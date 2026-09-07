@@ -147,13 +147,7 @@ function StatGraph({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        style={{
-          strokeDasharray: 800,
-          strokeDashoffset: animate ? 0 : 800,
-          transition: isUnstable
-            ? "stroke-dashoffset 1.5s ease-out"
-            : "stroke-dashoffset 1.1s ease-out",
-        }}
+        className={animate ? "os-stats__graph--animate" : ""}
       />
     </svg>
   );

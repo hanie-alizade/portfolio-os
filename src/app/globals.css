@@ -1033,10 +1033,10 @@ body {
 
 @keyframes draw-graph {
   from {
-    stroke-dashoffset: 800;
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -1053,12 +1053,34 @@ body {
   height: 0.7rem;
   background: rgba(74, 222, 128, 0.15);
   border-radius: 0.1rem;
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  transition: background 0.4s ease;
+  position: relative;
 }
 
 .os-stats__bug-block--active {
   background: var(--os-green);
+}
+
+.os-stats__bug-block--active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.1rem;
+  background: var(--os-green);
   box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.os-stats__bug-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.1rem;
+  background: var(--os-green);
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .os-coffee-section {
@@ -2639,6 +2661,10 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem 0.4rem;
+  }
+
+  .os-mobile-home__app-wrapper {
+    display: contents;
   }
 
   .os-mobile-home__app {

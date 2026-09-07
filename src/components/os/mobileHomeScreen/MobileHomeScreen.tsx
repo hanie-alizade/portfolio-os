@@ -15,19 +15,23 @@ export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
 
       <div className="os-mobile-home__grid" role="list">
         {dockApps.map((app) => (
-          <button
+          <div
             key={app.id}
-            type="button"
             role="listitem"
-            className="os-mobile-home__app"
-            aria-label={`${app.label}: ${app.hint}`}
-            onClick={() => launch(app.id)}
+            className="os-mobile-home__app-wrapper"
           >
-            <span className="os-mobile-home__app-icon">
-              <Image src={app.icon} alt="" width={48} height={48} />
-            </span>
-            <span className="os-mobile-home__app-label">{app.label}</span>
-          </button>
+            <button
+              type="button"
+              className="os-mobile-home__app"
+              aria-label={`${app.label}: ${app.hint}`}
+              onClick={() => launch(app.id)}
+            >
+              <span className="os-mobile-home__app-icon">
+                <Image src={app.icon} alt="" width={48} height={48} />
+              </span>
+              <span className="os-mobile-home__app-label">{app.label}</span>
+            </button>
+          </div>
         ))}
       </div>
     </div>
