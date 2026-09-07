@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { SystemStatsWindowContent } from "@/components/os/windows/SystemStatsWindowContent";
 import { dockApps } from "@/components/os/dockApps";
 import { useMobileAppLauncher } from "./useMobileAppLauncher";
@@ -23,7 +24,7 @@ export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
             onClick={() => launch(app.id)}
           >
             <span className="os-mobile-home__app-icon">
-              <img src={app.icon} alt="" width={48} height={48} />
+              <Image src={app.icon} alt="" width={48} height={48} />
             </span>
             <span className="os-mobile-home__app-label">{app.label}</span>
           </button>
