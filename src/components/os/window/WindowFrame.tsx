@@ -15,6 +15,7 @@ import {
 } from "./geometry";
 import type { ManagedWindow } from "./types";
 import { useWindowManager } from "./WindowManagerContext";
+import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
 
 type WindowFrameProps = {
   window: ManagedWindow;
@@ -49,7 +50,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
   const managedRef = useRef(managed);
   const setBoundsRef = useRef(setWindowBounds);
 
-  const [isCompact, setIsCompact] = useState(false);
+  const isCompact = useIsCompactViewport();
   const isFocused = state.focusedId === managed.id;
   const canDrag =
     !isCompact && !managed.isMaximized && managed.chrome !== "widget";
@@ -60,14 +61,6 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
     managedRef.current = managed;
     setBoundsRef.current = setWindowBounds;
   }, [managed, setWindowBounds]);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsCompact(media.matches);
-    sync();
-    media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
-  }, []);
 
   const applyTransform = useCallback((x: number, y: number) => {
     const node = frameRef.current;
@@ -210,6 +203,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
       : {
           width: managed.bounds.width,
           height: managed.bounds.height,
+          transform: `translate3d(${managed.bounds.x}px, ${managed.bounds.y}px, 0)`,
         };
 
   return (
@@ -271,6 +265,16 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
         </div>
       ) : null}
       <div className="os-window__body">{children}</div>
+      {isCompact && (
+        <button
+          type="button"
+          className="os-window__home-indicator"
+          aria-label="Back to Home Screen"
+          onClick={() => minimizeWindow(managed.id)}
+        >
+          <span className="os-window__home-indicator-bar" aria-hidden="true" />
+        </button>
+      )}
     </section>
   );
 }

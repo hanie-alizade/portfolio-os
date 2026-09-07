@@ -16,6 +16,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useWindowPayload } from "@/components/os/window/WindowManagerContext";
+import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
 
 type CaseStudy = {
   id: string;
@@ -98,6 +99,9 @@ const CASE_STUDIES: CaseStudy[] = [
 
 export function CaseStudiesWindowContent() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const isCompact = useIsCompactViewport();
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
+  const [isEntering, setIsEntering] = useState(false);
   const payload = useWindowPayload<CaseStudiesPayload>("case-studies");
   const activeStudy = CASE_STUDIES[activeIndex];
 
@@ -112,6 +116,14 @@ export function CaseStudiesWindowContent() {
     }
   }, [payload]);
 
+  useEffect(() => {
+    if (!isCompact) return;
+    setIsEntering(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsEntering(true));
+    });
+  }, [mobileView, isCompact]);
+
   const handlePrevious = () => {
     setActiveIndex((prev) => (prev === 0 ? CASE_STUDIES.length - 1 : prev - 1));
   };
@@ -122,204 +134,240 @@ export function CaseStudiesWindowContent() {
 
   const handleSelect = (index: number) => {
     setActiveIndex(index);
+    if (isCompact) {
+      setMobileView("detail");
+    }
   };
 
   return (
     <div className="os-case-studies">
-      <div className="os-case-studies__sidebar">
-        <div className="os-case-studies__sidebar-header">
-          <h3 className="os-case-studies__sidebar-title">Case Studies</h3>
-          <p className="os-case-studies__sidebar-subtitle">
-            Selected engineering work
-          </p>
-        </div>
-        <div className="os-case-studies__list">
-          {CASE_STUDIES.map((study, index) => {
-            const Icon = study.icon;
-            const isActive = index === activeIndex;
-            return (
-              <button
-                key={study.id}
-                type="button"
-                className={`os-case-studies__item${
-                  isActive ? " os-case-studies__item--active" : ""
-                }`}
-                onClick={() => handleSelect(index)}
-                aria-label={`Select ${study.title}`}
-                aria-current={isActive ? "true" : undefined}
-              >
-                <span className="os-case-studies__item-number">{study.id}</span>
-                <Icon
-                  className="os-case-studies__item-icon"
-                  size={20}
-                  strokeWidth={1.75}
-                />
-                <div className="os-case-studies__item-content">
-                  <span className="os-case-studies__item-title">
-                    {study.title}
-                  </span>
-                  <span className="os-case-studies__item-company">
-                    {study.company}
-                  </span>
-                </div>
-                <ChevronRight
-                  className="os-case-studies__item-chevron"
-                  size={16}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                />
-              </button>
-            );
-          })}
-        </div>
-        <div className="os-case-studies__nda-notice">
-          <div className="os-case-studies__nda-divider" />
-          <div className="os-case-studies__nda-content">
-            <LockKeyhole
-              size={16}
-              strokeWidth={1.75}
-              className="os-case-studies__nda-icon"
-              aria-hidden="true"
-            />
-            <div className="os-case-studies__nda-text">
-              <p className="os-case-studies__nda-heading">
-                Real work. Under NDA.
-              </p>
-              <p className="os-case-studies__nda-body">
-                Some projects can't be shown publicly, but the challenges,
-                decisions and impact are real.
-              </p>
-            </div>
+      {!isCompact || mobileView === "list" ? (
+        <div
+          className={`os-case-studies__sidebar${
+            isEntering && mobileView === "list"
+              ? " os-case-studies__sidebar--entering"
+              : ""
+          }`}
+        >
+          <div className="os-case-studies__sidebar-header">
+            <h3 className="os-case-studies__sidebar-title">Case Studies</h3>
+            <p className="os-case-studies__sidebar-subtitle">
+              Selected engineering work
+            </p>
           </div>
-        </div>
-      </div>
-      <div className="os-case-studies__main">
-        <div className="os-case-studies__content">
-          <div className="os-case-studies__breadcrumb">
-            <span>Case Studies</span>
-            <ChevronRight size={14} strokeWidth={2} aria-hidden="true" />
-            <span>{activeStudy.title}</span>
-          </div>
-          <div className="os-case-studies__company-badge">
-            {activeStudy.company}
-          </div>
-          <div className="os-case-studies__hero">
-            <div className="os-case-studies__hero-image os-window-content__media os-window-content__media--plain">
-              <Image
-                src={activeStudy.image}
-                alt={`Visual representation of ${activeStudy.title}`}
-                width={430}
-                height={319}
-                className="os-case-studies__hero-img"
-                loading="lazy"
-              />
-            </div>
-            <div className="os-case-studies__hero-text">
-              <h2 className="os-case-studies__title">{activeStudy.title}</h2>
-              <p className="os-case-studies__description">
-                {activeStudy.description}
-              </p>
-              <div className="os-case-studies__tags">
-                {activeStudy.tags.map((tag) => (
-                  <span key={tag} className="os-case-studies__tag">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="os-case-studies__star-grid">
-            <div className="os-case-studies__star-card">
-              <div className="os-case-studies__star-icon-wrapper">
-                <Target
-                  size={24}
-                  strokeWidth={1.75}
-                  className="os-case-studies__star-icon"
-                  aria-hidden="true"
-                />
-              </div>
-              <h4 className="os-case-studies__star-heading">Situation</h4>
-              <p className="os-case-studies__star-body">
-                {activeStudy.situation}
-              </p>
-            </div>
-            <div className="os-case-studies__star-card">
-              <div className="os-case-studies__star-icon-wrapper">
-                <ClipboardList
-                  size={24}
-                  strokeWidth={1.75}
-                  className="os-case-studies__star-icon"
-                  aria-hidden="true"
-                />
-              </div>
-              <h4 className="os-case-studies__star-heading">Task</h4>
-              <p className="os-case-studies__star-body">{activeStudy.task}</p>
-            </div>
-            <div className="os-case-studies__star-card">
-              <div className="os-case-studies__star-icon-wrapper">
-                <Workflow
-                  size={24}
-                  strokeWidth={1.75}
-                  className="os-case-studies__star-icon"
-                  aria-hidden="true"
-                />
-              </div>
-              <h4 className="os-case-studies__star-heading">Action</h4>
-              <p className="os-case-studies__star-body">{activeStudy.action}</p>
-            </div>
-            <div className="os-case-studies__star-card">
-              <div className="os-case-studies__star-icon-wrapper">
-                <TrendingUp
-                  size={24}
-                  strokeWidth={1.75}
-                  className="os-case-studies__star-icon"
-                  aria-hidden="true"
-                />
-              </div>
-              <h4 className="os-case-studies__star-heading">Result</h4>
-              <p className="os-case-studies__star-body">{activeStudy.result}</p>
-            </div>
-          </div>
-          <div className="os-case-studies__navigation">
-            <button
-              type="button"
-              className="os-case-studies__nav-button"
-              onClick={handlePrevious}
-              aria-label="Previous case study"
-            >
-              <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
-              <span>Previous</span>
-            </button>
-            <div className="os-case-studies__pagination">
-              {CASE_STUDIES.map((study, index) => (
+          <div className="os-case-studies__list">
+            {CASE_STUDIES.map((study, index) => {
+              const Icon = study.icon;
+              const isActive = index === activeIndex;
+              return (
                 <button
                   key={study.id}
                   type="button"
-                  className={`os-case-studies__pagination-indicator${
-                    index === activeIndex
-                      ? " os-case-studies__pagination-indicator--active"
-                      : ""
+                  className={`os-case-studies__item${
+                    isActive ? " os-case-studies__item--active" : ""
                   }`}
                   onClick={() => handleSelect(index)}
-                  aria-label={`Go to case study ${study.id}`}
-                  aria-current={index === activeIndex ? "true" : undefined}
+                  aria-label={`Select ${study.title}`}
+                  aria-current={isActive ? "true" : undefined}
                 >
-                  {study.id}
+                  <span className="os-case-studies__item-number">
+                    {study.id}
+                  </span>
+                  <Icon
+                    className="os-case-studies__item-icon"
+                    size={20}
+                    strokeWidth={1.75}
+                  />
+                  <div className="os-case-studies__item-content">
+                    <span className="os-case-studies__item-title">
+                      {study.title}
+                    </span>
+                    <span className="os-case-studies__item-company">
+                      {study.company}
+                    </span>
+                  </div>
+                  <ChevronRight
+                    className="os-case-studies__item-chevron"
+                    size={16}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
                 </button>
-              ))}
+              );
+            })}
+          </div>
+          <div className="os-case-studies__nda-notice">
+            <div className="os-case-studies__nda-divider" />
+            <div className="os-case-studies__nda-content">
+              <LockKeyhole
+                size={16}
+                strokeWidth={1.75}
+                className="os-case-studies__nda-icon"
+                aria-hidden="true"
+              />
+              <div className="os-case-studies__nda-text">
+                <p className="os-case-studies__nda-heading">
+                  Real work. Under NDA.
+                </p>
+                <p className="os-case-studies__nda-body">
+                  Some projects can't be shown publicly, but the challenges,
+                  decisions and impact are real.
+                </p>
+              </div>
             </div>
-            <button
-              type="button"
-              className="os-case-studies__nav-button"
-              onClick={handleNext}
-              aria-label="Next case study"
-            >
-              <span>Next</span>
-              <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
-            </button>
           </div>
         </div>
-      </div>
+      ) : null}
+      {!isCompact || mobileView === "detail" ? (
+        <div
+          className={`os-case-studies__main${
+            isEntering && mobileView === "detail"
+              ? " os-case-studies__main--entering"
+              : ""
+          }`}
+        >
+          <div className="os-case-studies__content">
+            {isCompact && mobileView === "detail" && (
+              <button
+                type="button"
+                className="os-case-studies__back-button"
+                onClick={() => setMobileView("list")}
+                aria-label="Back to case studies list"
+              >
+                <ChevronLeft size={18} strokeWidth={2} aria-hidden="true" />
+                <span>Case Studies</span>
+              </button>
+            )}
+            <div className="os-case-studies__breadcrumb">
+              <span>Case Studies</span>
+              <ChevronRight size={14} strokeWidth={2} aria-hidden="true" />
+              <span>{activeStudy.title}</span>
+            </div>
+            <div className="os-case-studies__company-badge">
+              {activeStudy.company}
+            </div>
+            <div className="os-case-studies__hero">
+              <div className="os-case-studies__hero-image os-window-content__media os-window-content__media--plain">
+                <Image
+                  src={activeStudy.image}
+                  alt={`Visual representation of ${activeStudy.title}`}
+                  width={430}
+                  height={319}
+                  className="os-case-studies__hero-img"
+                  loading="lazy"
+                />
+              </div>
+              <div className="os-case-studies__hero-text">
+                <h2 className="os-case-studies__title">{activeStudy.title}</h2>
+                <p className="os-case-studies__description">
+                  {activeStudy.description}
+                </p>
+                <div className="os-case-studies__tags">
+                  {activeStudy.tags.map((tag) => (
+                    <span key={tag} className="os-case-studies__tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="os-case-studies__star-grid">
+              <div className="os-case-studies__star-card">
+                <div className="os-case-studies__star-icon-wrapper">
+                  <Target
+                    size={24}
+                    strokeWidth={1.75}
+                    className="os-case-studies__star-icon"
+                    aria-hidden="true"
+                  />
+                </div>
+                <h4 className="os-case-studies__star-heading">Situation</h4>
+                <p className="os-case-studies__star-body">
+                  {activeStudy.situation}
+                </p>
+              </div>
+              <div className="os-case-studies__star-card">
+                <div className="os-case-studies__star-icon-wrapper">
+                  <ClipboardList
+                    size={24}
+                    strokeWidth={1.75}
+                    className="os-case-studies__star-icon"
+                    aria-hidden="true"
+                  />
+                </div>
+                <h4 className="os-case-studies__star-heading">Task</h4>
+                <p className="os-case-studies__star-body">{activeStudy.task}</p>
+              </div>
+              <div className="os-case-studies__star-card">
+                <div className="os-case-studies__star-icon-wrapper">
+                  <Workflow
+                    size={24}
+                    strokeWidth={1.75}
+                    className="os-case-studies__star-icon"
+                    aria-hidden="true"
+                  />
+                </div>
+                <h4 className="os-case-studies__star-heading">Action</h4>
+                <p className="os-case-studies__star-body">
+                  {activeStudy.action}
+                </p>
+              </div>
+              <div className="os-case-studies__star-card">
+                <div className="os-case-studies__star-icon-wrapper">
+                  <TrendingUp
+                    size={24}
+                    strokeWidth={1.75}
+                    className="os-case-studies__star-icon"
+                    aria-hidden="true"
+                  />
+                </div>
+                <h4 className="os-case-studies__star-heading">Result</h4>
+                <p className="os-case-studies__star-body">
+                  {activeStudy.result}
+                </p>
+              </div>
+            </div>
+            <div className="os-case-studies__navigation">
+              <button
+                type="button"
+                className="os-case-studies__nav-button"
+                onClick={handlePrevious}
+                aria-label="Previous case study"
+              >
+                <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
+                <span>Previous</span>
+              </button>
+              <div className="os-case-studies__pagination">
+                {CASE_STUDIES.map((study, index) => (
+                  <button
+                    key={study.id}
+                    type="button"
+                    className={`os-case-studies__pagination-indicator${
+                      index === activeIndex
+                        ? " os-case-studies__pagination-indicator--active"
+                        : ""
+                    }`}
+                    onClick={() => handleSelect(index)}
+                    aria-label={`Go to case study ${study.id}`}
+                    aria-current={index === activeIndex ? "true" : undefined}
+                  >
+                    {study.id}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="os-case-studies__nav-button"
+                onClick={handleNext}
+                aria-label="Next case study"
+              >
+                <span>Next</span>
+                <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -7,6 +7,7 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "About Me",
     bounds: { x: 350, y: 15, width: 700, height: 400 },
     isOpen: true,
+    isOpenOnMobile: false,
   },
   {
     id: "nda",
@@ -14,6 +15,7 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "NDA",
     bounds: { x: 24, y: 30, width: 790, height: 520 },
     isOpen: false,
+    isOpenOnMobile: false,
   },
   {
     id: "case-studies",
@@ -21,6 +23,7 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "Case Studies",
     bounds: { x: 100, y: 14, width: 1200, height: 650 },
     isOpen: false,
+    isOpenOnMobile: false,
   },
   {
     id: "contact",
@@ -28,6 +31,7 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "Contact",
     bounds: { x: 1000, y: 150, width: 380, height: 420 },
     isOpen: false,
+    isOpenOnMobile: false,
   },
   {
     id: "experience",
@@ -35,6 +39,7 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "Experience",
     bounds: { x: 60, y: 15, width: 630, height: 600 },
     isOpen: false,
+    isOpenOnMobile: false,
   },
   {
     id: "resume",
@@ -42,5 +47,6 @@ export const INITIAL_WINDOWS: CreateWindowInput[] = [
     title: "Resume",
     bounds: { x: 180, y: 20, width: 790, height: 550 },
     isOpen: false,
+    isOpenOnMobile: false,
   },
 ];

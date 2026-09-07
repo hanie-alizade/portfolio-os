@@ -22,7 +22,7 @@ export function getDesktopAreaSize() {
   if (!area) {
     return {
       width: window.innerWidth,
-      height: Math.max(window.innerHeight - 120, 240),
+      height: Math.max(window.innerHeight - 60, 240),
     };
   }
 
@@ -109,6 +109,12 @@ export function calculateViewportAwarePosition(
   // Vertical fitting: only move up if the window would extend beyond bottom edge
   const bottomEdge = y + height;
   if (bottomEdge > area.height) {
+    console.log({
+      bottomEdge,
+      final: area.height - height - EDGE_MARGIN,
+      area,
+      bounds,
+    });
     // Move up only as much as necessary to fit, preserving edge margin
     adjustedY = Math.max(EDGE_MARGIN, area.height - height - EDGE_MARGIN);
   }
