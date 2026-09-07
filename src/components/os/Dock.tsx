@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import {
   useMotionValue,
@@ -19,24 +19,31 @@ const MAX_SIZE = 68;
 function DockIcon({
   app,
   mouseX,
+  index,
+  dockRectRef,
   isRunning,
   isFocused,
   onClick,
 }: {
   app: DockApp;
   mouseX: MotionValue<number>;
+  index: number;
+  dockRectRef: React.RefObject<DOMRect | null>;
   isRunning: boolean;
   isFocused: boolean;
   onClick: () => void;
 }) {
-  const ref = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered] = useState(false);
 
-  // distance between cursor and this icon's own center — read live from the DOM
+  // Calculate distance without per-icon layout reads
+  // Use estimated positions based on dock rect and index
   const distance = useTransform(mouseX, (val) => {
-    const bounds = ref.current?.getBoundingClientRect();
-    if (!bounds) return Infinity;
-    return val - (bounds.left + bounds.width / 2);
+    const rect = dockRectRef.current;
+    if (!rect) return Infinity;
+    // Estimate icon center based on flex layout: roughly BASE_SIZE + 12px gap per icon
+    const estimatedIconCenter =
+      rect.left + index * (BASE_SIZE + 12) + BASE_SIZE / 2;
+    return val - estimatedIconCenter;
   });
 
   const scaleTarget = useTransform(
@@ -52,7 +59,6 @@ function DockIcon({
 
   return (
     <button
-      ref={ref}
       type="button"
       className="os-dock-item"
       aria-label={`${app.label}: ${app.hint}`}
@@ -87,15 +93,36 @@ function DockIcon({
 export function Dock() {
   const { state, launchApp, getWindowByAppId } = useWindowManager();
   const mouseX = useMotionValue(Infinity);
+  const dockRef = useRef<HTMLElement>(null);
+  const dockRectRef = useRef<DOMRect | null>(null);
+
+  // Update dock rect on mount and resize
+  useEffect(() => {
+    const updateDockRect = () => {
+      dockRectRef.current = dockRef.current?.getBoundingClientRect() || null;
+    };
+
+    updateDockRect();
+    window.addEventListener("resize", updateDockRect);
+    return () => window.removeEventListener("resize", updateDockRect);
+  }, []);
 
   return (
     <nav
+      ref={dockRef}
       className="os-dock"
       aria-label="Application dock"
-      onMouseMove={(e) => mouseX.set(e.clientX)}
-      onMouseLeave={() => mouseX.set(Infinity)}
+      onMouseMove={(e) => {
+        mouseX.set(e.clientX);
+        // Single layout read per mouse move, not per icon
+        dockRectRef.current = dockRef.current?.getBoundingClientRect() || null;
+      }}
+      onMouseLeave={() => {
+        mouseX.set(Infinity);
+        dockRectRef.current = null;
+      }}
     >
-      {dockApps.map((app) => {
+      {dockApps.map((app, index) => {
         const managed = getWindowByAppId(app.id);
         const isRunning = Boolean(managed?.isOpen);
         const isFocused =
@@ -108,6 +135,8 @@ export function Dock() {
             key={app.id}
             app={app}
             mouseX={mouseX}
+            index={index}
+            dockRectRef={dockRectRef}
             isRunning={isRunning}
             isFocused={isFocused}
             onClick={() => launchApp(app.id)}

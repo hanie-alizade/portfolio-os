@@ -1,9 +1,29 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { DesktopWidget } from "./DesktopWidget";
-import { TerminalWindowContent } from "./windows/TerminalWindowContent";
-import { SystemStatsWindowContent } from "./windows/SystemStatsWindowContent";
-import { StickyNoteWindowContent } from "./windows/StickyNoteWindowContent";
+
+const TerminalWindowContent = dynamic(
+  () =>
+    import("./windows/TerminalWindowContent").then(
+      (m) => m.TerminalWindowContent
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="os-window__body" aria-busy="true" />,
+  }
+);
+
+const SystemStatsWindowContent = dynamic(
+  () =>
+    import("./windows/SystemStatsWindowContent").then(
+      (m) => m.SystemStatsWindowContent
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="os-window__body" aria-busy="true" />,
+  }
+);
 
 export function DesktopHero() {
   return (
