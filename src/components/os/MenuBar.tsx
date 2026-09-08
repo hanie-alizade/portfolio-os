@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { SystemClock } from "@/components/os/SystemClock";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
+import { useMenuBar } from "@/components/os/MenuBarContext";
 
 const SKILLS = {
   Frontend: [
@@ -45,21 +46,124 @@ function SkillsDropdown({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setHasEntered(false);
+      setOpenCategory(null);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setHasEntered(true));
+      });
+    } else {
+      setHasEntered(false);
+      setOpenCategory(null);
+      const timer = setTimeout(() => setShouldRender(false), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleCategoryHover = (category: string) => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+    }
+    setOpenCategory(category);
+  };
+
+  const handleCategoryLeave = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+    }
+    const timeout = setTimeout(() => setOpenCategory(null), 250);
+    setHoverTimeout(timeout);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    setOpenCategory(openCategory === category ? null : category);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, category: string) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setOpenCategory(openCategory === category ? null : category);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setOpenCategory(null);
+    }
+  };
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="os-menu-dropdown" onMouseLeave={onClose}>
+    <div
+      className={`os-menu-dropdown ${
+        hasEntered && !reducedMotion ? "os-menu-dropdown--enter" : ""
+      }`}
+      onMouseLeave={onClose}
+    >
       <div className="os-menu-dropdown__content">
-        {Object.entries(SKILLS).map(([category, items]) => (
-          <div key={category} className="os-menu-dropdown__section">
-            <h5 className="os-menu-dropdown__category">{category}</h5>
-            <ul className="os-menu-dropdown__list">
-              {items.map((skill) => (
-                <li key={skill}>{skill}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <ul className="os-menu-dropdown__list">
+          {Object.keys(SKILLS).map((category) => (
+            <li key={category}>
+              <button
+                type="button"
+                className="os-menu-dropdown__item flex justify-between"
+                onMouseEnter={() => handleCategoryHover(category)}
+                onMouseLeave={handleCategoryLeave}
+                onClick={() => handleCategoryClick(category)}
+                onKeyDown={(e) => handleKeyDown(e, category)}
+                aria-haspopup="true"
+                aria-expanded={openCategory === category}
+              >
+                {category}
+                <span className="ml-auto text-os-text-subtle">▸</span>
+              </button>
+              {openCategory === category && (
+                <div
+                  className={`os-menu-dropdown os-menu-dropdown--submenu ${
+                    hasEntered && !reducedMotion
+                      ? "os-menu-dropdown--enter"
+                      : ""
+                  }`}
+                  style={{
+                    position: "absolute",
+                    left: "100%",
+                    top: 0,
+                    marginLeft: "0.25rem",
+                    transformOrigin: "left center",
+                  }}
+                  onMouseEnter={() => {
+                    if (hoverTimeout) {
+                      clearTimeout(hoverTimeout);
+                    }
+                  }}
+                  onMouseLeave={handleCategoryLeave}
+                >
+                  <div className="os-menu-dropdown__content">
+                    <ul className="os-menu-dropdown__list">
+                      {SKILLS[category as keyof typeof SKILLS].map((skill) => (
+                        <li key={skill}>{skill}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -73,15 +177,45 @@ function WindowMenu({
   onClose: () => void;
 }) {
   const { state, focusWindow, openWindow } = useWindowManager();
+  const [shouldRender, setShouldRender] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setHasEntered(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setHasEntered(true));
+      });
+    } else {
+      setHasEntered(false);
+      const timer = setTimeout(() => setShouldRender(false), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   const openWindows = Object.values(state.windows)
     .filter((window) => window.isOpen)
     .sort((a, b) => b.zIndex - a.zIndex);
 
   return (
-    <div className="os-menu-dropdown" onMouseLeave={onClose}>
+    <div
+      className={`os-menu-dropdown ${
+        hasEntered && !reducedMotion ? "os-menu-dropdown--enter" : ""
+      }`}
+      onMouseLeave={onClose}
+    >
       <div className="os-menu-dropdown__content os-menu-dropdown__content--window">
         {openWindows.length === 0 ? (
           <p className="os-menu-dropdown__empty">No windows open</p>
@@ -115,10 +249,41 @@ function HelpMenu({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setHasEntered(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setHasEntered(true));
+      });
+    } else {
+      setHasEntered(false);
+      const timer = setTimeout(() => setShouldRender(false), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="os-menu-dropdown" onMouseLeave={onClose}>
+    <div
+      className={`os-menu-dropdown ${
+        hasEntered && !reducedMotion ? "os-menu-dropdown--enter" : ""
+      }`}
+      onMouseLeave={onClose}
+    >
       <div className="os-menu-dropdown__content os-menu-dropdown__content--help">
         <h5 className="os-menu-dropdown__category">Built with</h5>
         <ul className="os-menu-dropdown__list">
@@ -133,16 +298,19 @@ function HelpMenu({
 }
 
 export function MenuBar() {
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const { activeMenu, openMenu, closeMenu } = useMenuBar();
   const { openWindow } = useWindowManager();
 
-  const toggleMenu = useCallback((menu: string) => {
-    setActiveMenu((current) => (current === menu ? null : menu));
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    setActiveMenu(null);
-  }, []);
+  const toggleMenu = useCallback(
+    (menu: string) => {
+      if (activeMenu === menu) {
+        closeMenu();
+      } else {
+        openMenu(menu);
+      }
+    },
+    [activeMenu, openMenu, closeMenu]
+  );
 
   return (
     <header className="os-menubar" role="banner">

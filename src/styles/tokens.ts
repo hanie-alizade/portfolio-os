@@ -20,6 +20,7 @@ export const osTokens = {
     sm: "var(--os-radius-sm)",
     md: "var(--os-radius-md)",
     lg: "var(--os-radius-lg)",
+    dock: "var(--os-radius-dock)",
     xl: "var(--os-radius-xl)",
     pill: "var(--os-radius-pill)",
   },

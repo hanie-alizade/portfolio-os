@@ -38,13 +38,16 @@ type Action =
   | { type: "TOGGLE_MAXIMIZE"; id: WindowId }
   | { type: "SET_BOUNDS"; id: WindowId; bounds: WindowBounds }
   | { type: "OPEN"; id: WindowId }
-  | { type: "LAUNCH_APP"; appId: DockAppId };
+  | { type: "LAUNCH_APP"; appId: DockAppId }
+  | { type: "SET_PAYLOAD"; id: WindowId; payload: unknown }
+  | { type: "CLEAR_PAYLOAD"; id: WindowId };
 
 function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
   const windows: Record<WindowId, ManagedWindow> = {};
   const windowOrder: WindowId[] = [];
   let topZ = 10;
   let focusedId: WindowId | null = null;
+  const pendingPayloads: Partial<Record<WindowId, unknown>> = {};
 
   const isSSR =
     typeof document === "undefined" || typeof window === "undefined";
@@ -69,7 +72,7 @@ function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
     }
   }
 
-  return { windows, windowOrder, focusedId, topZ };
+  return { windows, windowOrder, focusedId, topZ, pendingPayloads };
 }
 
 function focusWindowState(
@@ -248,6 +251,24 @@ function reducer(
       return reducer(state, { type: "OPEN", id });
     }
 
+    case "SET_PAYLOAD": {
+      return {
+        ...state,
+        pendingPayloads: {
+          ...state.pendingPayloads,
+          [action.id]: action.payload,
+        },
+      };
+    }
+
+    case "CLEAR_PAYLOAD": {
+      const { [action.id]: _, ...rest } = state.pendingPayloads;
+      return {
+        ...state,
+        pendingPayloads: rest,
+      };
+    }
+
     default:
       return state;
   }
@@ -261,9 +282,10 @@ type WindowManagerApi = {
   restoreWindow: (id: WindowId) => void;
   toggleMaximize: (id: WindowId) => void;
   setWindowBounds: (id: WindowId, bounds: WindowBounds) => void;
-  openWindow: (id: WindowId) => void;
+  openWindow: (id: WindowId, payload?: unknown) => void;
   launchApp: (appId: DockAppId) => void;
   getWindowByAppId: (appId: DockAppId) => ManagedWindow | null;
+  dispatch: React.Dispatch<Action>;
 };
 
 const WindowManagerContext = createContext<WindowManagerApi | null>(null);
@@ -322,7 +344,10 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "SET_BOUNDS", id, bounds });
   }, []);
 
-  const openWindow = useCallback((id: WindowId) => {
+  const openWindow = useCallback((id: WindowId, payload?: unknown) => {
+    if (payload !== undefined) {
+      dispatch({ type: "SET_PAYLOAD", id, payload });
+    }
     dispatch({ type: "OPEN", id });
   }, []);
 
@@ -350,6 +375,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       openWindow,
       launchApp,
       getWindowByAppId,
+      dispatch,
     }),
     [
       state,
@@ -362,6 +388,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       openWindow,
       launchApp,
       getWindowByAppId,
+      dispatch,
     ]
   );
 
@@ -380,4 +407,17 @@ export function useWindowManager() {
     );
   }
   return context;
+}
+
+export function useWindowPayload<T>(id: WindowId): T | undefined {
+  const { state, dispatch } = useWindowManager();
+  const payload = state.pendingPayloads[id] as T | undefined;
+
+  useEffect(() => {
+    if (payload !== undefined) {
+      dispatch({ type: "CLEAR_PAYLOAD", id });
+    }
+  }, [payload, id, dispatch]);
+
+  return payload;
 }
