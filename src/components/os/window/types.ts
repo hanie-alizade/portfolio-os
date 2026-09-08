@@ -38,6 +38,7 @@ export type CreateWindowInput = {
   appId?: DockAppId;
   bounds: WindowBounds;
   isOpen?: boolean;
+  isOpenOnMobile?: boolean;
   isMinimized?: boolean;
   isMaximized?: boolean;
   chrome?: WindowChrome;

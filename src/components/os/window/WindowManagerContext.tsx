@@ -52,6 +52,8 @@ function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
   const isSSR =
     typeof document === "undefined" || typeof window === "undefined";
 
+  const compact = !isSSR && isCompactViewport();
+
   for (const input of inputs) {
     topZ += 1;
     const bounds = isSSR
@@ -65,9 +67,15 @@ function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
             referenceBounds
           );
         })();
-    windows[input.id] = createManagedWindow({ ...input, bounds }, topZ);
+    const resolvedIsOpen = compact
+      ? input.isOpenOnMobile ?? false
+      : input.isOpen ?? true;
+    windows[input.id] = createManagedWindow(
+      { ...input, bounds, isOpen: resolvedIsOpen },
+      topZ
+    );
     windowOrder.push(input.id);
-    if (input.isOpen !== false && !input.isMinimized) {
+    if (resolvedIsOpen && !input.isMinimized) {
       focusedId = input.id;
     }
   }

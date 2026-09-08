@@ -21,40 +21,44 @@ export function AboutWindowContent() {
   return (
     <div className="os-window-content os-window-content--about">
       <div className="os-window-content__copy ">
-        <p className="os-eyebrow">Frontend Engineer</p>
-        <h3 className="os-window-heading">
-          I turn complex systems into interfaces people actually enjoy using.
-        </h3>
-        <div className="flex flex-col gap-1">
-          <p className="os-window-copy">
-            Senior Frontend Engineer with {years}+ years building production
-            interfaces.
-          </p>
-          <p className="os-window-copy">
-            From logistics dashboards handling 1,000+ orders a day, to wallet &
-            transaction flows, enterprise platforms, and healthcare tools.
-          </p>
+        <div className="min-h-[100px] h-1/2 max-h-[180px] flex flex-col justify-between gap-2">
+          <p className="os-eyebrow">Frontend Engineer</p>
+          <h3 className="os-window-heading">
+            I turn complex systems into interfaces people actually enjoy using.
+          </h3>
+          <div className="flex flex-col gap-1">
+            <p className="os-window-copy">
+              Senior Frontend Engineer with {years}+ years building production
+              interfaces.
+            </p>
+            <p className="os-window-copy">
+              From logistics dashboards handling 1,000+ orders a day, to wallet
+              & transaction flows, enterprise platforms, and healthcare tools.
+            </p>
+          </div>
         </div>
-        <div className="os-chip-row" aria-label="Key highlights">
-          {HIGHLIGHTS.map((highlight) => (
-            <span
-              key={highlight.label}
-              className="os-chip"
-              style={
-                { "--chip-accent": highlight.accent } as React.CSSProperties
-              }
-            >
-              {highlight.label}
-            </span>
-          ))}
+        <div className="min-h-[60px] h-1/3 max-h-[80px] flex flex-col justify-between gap-2 items-center">
+          <div className="os-chip-row" aria-label="Key highlights">
+            {HIGHLIGHTS.map((highlight) => (
+              <span
+                key={highlight.label}
+                className="os-chip"
+                style={
+                  { "--chip-accent": highlight.accent } as React.CSSProperties
+                }
+              >
+                {highlight.label}
+              </span>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="os-link"
+            onClick={() => openMenu("skills")}
+          >
+            + full stack in the Skills menu ↗
+          </button>
         </div>
-        <button
-          type="button"
-          className="os-link"
-          onClick={() => openMenu("skills")}
-        >
-          + full stack in the Skills menu ↗
-        </button>
         <div className="os-action-row">
           <button
             type="button"
