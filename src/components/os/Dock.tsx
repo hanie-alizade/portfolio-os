@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import {
   useMotionValue,
@@ -12,38 +12,35 @@ import {
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 import type { DockApp } from "./dockApps";
 import { dockApps } from "./dockApps";
+import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
 
 const BASE_SIZE = 44;
-const MAX_SIZE = 68;
+const MAX_SIZE = 70;
 
 function DockIcon({
   app,
   mouseX,
-  index,
-  dockRectRef,
   isRunning,
   isFocused,
   onClick,
+  isCompact,
 }: {
   app: DockApp;
   mouseX: MotionValue<number>;
-  index: number;
-  dockRectRef: React.RefObject<DOMRect | null>;
   isRunning: boolean;
   isFocused: boolean;
   onClick: () => void;
+  isCompact: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
+  const iconRef = useRef<HTMLDivElement>(null);
 
-  // Calculate distance without per-icon layout reads
-  // Use estimated positions based on dock rect and index
+  // Calculate distance using actual icon position
   const distance = useTransform(mouseX, (val) => {
-    const rect = dockRectRef.current;
-    if (!rect) return Infinity;
-    // Estimate icon center based on flex layout: roughly BASE_SIZE + 12px gap per icon
-    const estimatedIconCenter =
-      rect.left + index * (BASE_SIZE + 12) + BASE_SIZE / 2;
-    return val - estimatedIconCenter;
+    const iconRect = iconRef.current?.getBoundingClientRect();
+    if (!iconRect) return Infinity;
+    const iconCenter = iconRect.left + iconRect.width / 2;
+    return val - iconCenter;
   });
 
   const scaleTarget = useTransform(
@@ -57,6 +54,39 @@ function DockIcon({
     mass: 0.8,
   });
 
+  const tooltipStyle = { opacity: hovered ? 1 : 0 };
+
+  const handleMouseEnter = () => setHovered(true);
+  const handleMouseLeave = () => setHovered(false);
+
+  if (isCompact) {
+    return (
+      <button
+        type="button"
+        className="os-dock-item"
+        aria-label={`${app.label}: ${app.hint}`}
+        aria-current={isFocused ? "true" : undefined}
+        onClick={onClick}
+      >
+        <span className="os-dock-item__tooltip" style={{ opacity: 0 }}>
+          {app.label}
+        </span>
+        <div className="os-dock-item__icon-wrap" ref={iconRef}>
+          <Image
+            src={app.icon}
+            alt=""
+            width={BASE_SIZE}
+            height={BASE_SIZE}
+            className="os-dock-item__icon"
+          />
+        </div>
+        {isRunning ? (
+          <span className="os-dock-item__indicator" aria-hidden="true" />
+        ) : null}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -64,17 +94,18 @@ function DockIcon({
       aria-label={`${app.label}: ${app.hint}`}
       aria-current={isFocused ? "true" : undefined}
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <motion.span
-        className="os-dock-item__tooltip"
-        style={{ opacity: hovered ? 1 : 0 }}
-      >
+      <motion.span className="os-dock-item__tooltip" style={tooltipStyle}>
         {app.label}
         {/* <span className="os-dock-item__tooltip-arrow" aria-hidden="true" /> */}
       </motion.span>
-      <motion.div className="os-dock-item__icon-wrap" style={{ scale }}>
+      <motion.div
+        className="os-dock-item__icon-wrap"
+        style={{ scale }}
+        ref={iconRef}
+      >
         <Image
           src={app.icon}
           alt=""
@@ -92,37 +123,28 @@ function DockIcon({
 
 export function Dock() {
   const { state, launchApp, getWindowByAppId } = useWindowManager();
+  const isCompact = useIsCompactViewport();
   const mouseX = useMotionValue(Infinity);
-  const dockRef = useRef<HTMLElement>(null);
-  const dockRectRef = useRef<DOMRect | null>(null);
 
-  // Update dock rect on mount and resize
-  useEffect(() => {
-    const updateDockRect = () => {
-      dockRectRef.current = dockRef.current?.getBoundingClientRect() || null;
-    };
-
-    updateDockRect();
-    window.addEventListener("resize", updateDockRect);
-    return () => window.removeEventListener("resize", updateDockRect);
-  }, []);
+  // Show only first 4 apps on mobile, all apps on desktop
+  const visibleApps = isCompact ? dockApps.slice(0, 4) : dockApps;
 
   return (
     <nav
-      ref={dockRef}
       className="os-dock"
       aria-label="Application dock"
       onMouseMove={(e) => {
-        mouseX.set(e.clientX);
-        // Single layout read per mouse move, not per icon
-        dockRectRef.current = dockRef.current?.getBoundingClientRect() || null;
+        if (!isCompact) {
+          mouseX.set(e.clientX);
+        }
       }}
       onMouseLeave={() => {
-        mouseX.set(Infinity);
-        dockRectRef.current = null;
+        if (!isCompact) {
+          mouseX.set(Infinity);
+        }
       }}
     >
-      {dockApps.map((app, index) => {
+      {visibleApps.map((app, index) => {
         const managed = getWindowByAppId(app.id);
         const isRunning = Boolean(managed?.isOpen);
         const isFocused =
@@ -135,11 +157,10 @@ export function Dock() {
             key={app.id}
             app={app}
             mouseX={mouseX}
-            index={index}
-            dockRectRef={dockRectRef}
             isRunning={isRunning}
             isFocused={isFocused}
             onClick={() => launchApp(app.id)}
+            isCompact={isCompact}
           />
         );
       })}

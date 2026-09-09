@@ -18,6 +18,9 @@ const SystemStatsWindowContent = dynamic(
 export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
   const launch = useMobileAppLauncher();
 
+  // Show apps from index 4 onwards (remaining apps not in Dock)
+  const remainingApps = dockApps.slice(4);
+
   return (
     <div className={`os-mobile-home${hidden ? " os-mobile-home--hidden" : ""}`}>
       <div className="os-mobile-home__widget">
@@ -25,7 +28,7 @@ export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
       </div>
 
       <div className="os-mobile-home__grid" role="list">
-        {dockApps.map((app) => (
+        {remainingApps.map((app) => (
           <div
             key={app.id}
             role="listitem"

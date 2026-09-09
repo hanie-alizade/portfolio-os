@@ -19,6 +19,8 @@ type DesktopWidgetProps = {
   id: string;
   children: ReactNode;
   initialBounds: { x: number; y: number; width: number; height: number };
+  zIndex: number;
+  onFocus: () => void;
 };
 
 type DragSession = {
@@ -38,15 +40,24 @@ export function DesktopWidget({
   id,
   children,
   initialBounds,
+  zIndex,
+  onFocus,
 }: DesktopWidgetProps) {
   const frameRef = useRef<HTMLElement>(null);
   const dragRef = useRef<DragSession | null>(null);
+  const boundsRef = useRef(initialBounds);
+  const onFocusRef = useRef(onFocus);
   const [bounds, setBounds] = useState(() => {
     if (typeof window === "undefined") return initialBounds;
     const area = getDesktopAreaSize();
     return calculateViewportAwarePosition(initialBounds, area, initialBounds);
   });
   const isCompact = useIsCompactViewport();
+
+  useEffect(() => {
+    boundsRef.current = bounds;
+    onFocusRef.current = onFocus;
+  }, [bounds, onFocus]);
 
   const applyTransform = useCallback((x: number, y: number) => {
     const node = frameRef.current;
@@ -128,18 +139,19 @@ export function DesktopWidget({
       if (compact) return;
 
       pointerEvent.preventDefault();
+      onFocusRef.current();
 
       dragRef.current = {
         pointerId: pointerEvent.pointerId,
         startX: pointerEvent.clientX,
         startY: pointerEvent.clientY,
-        originX: bounds.x,
-        originY: bounds.y,
-        width: bounds.width,
-        height: bounds.height,
+        originX: boundsRef.current.x,
+        originY: boundsRef.current.y,
+        width: boundsRef.current.width,
+        height: boundsRef.current.height,
         raf: null,
-        latestX: bounds.x,
-        latestY: bounds.y,
+        latestX: boundsRef.current.x,
+        latestY: boundsRef.current.y,
       };
 
       frameRef.current?.classList.add("os-widget--dragging");
@@ -162,18 +174,20 @@ export function DesktopWidget({
       }
       dragRef.current = null;
     };
-  }, [bounds, applyTransform]);
+  }, [applyTransform]);
 
   const compactStyle = isCompact
     ? {
         width: "100%",
         height: "100%",
         transform: "translate3d(0px, 0px, 0)",
+        zIndex,
       }
     : {
         width: bounds.width,
         height: bounds.height,
         transform: `translate3d(${bounds.x}px, ${bounds.y}px, 0)`,
+        zIndex,
       };
 
   return (

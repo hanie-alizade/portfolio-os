@@ -58,8 +58,9 @@
 
   /* ——— Glass ——— */
   --os-glass-bg-widget: rgba(8, 12, 28, 0.548);
+  --os-glass-bg-widget-light: rgba(41, 38, 58, 0.692);
   --os-glass-bg: rgba(8, 12, 28, 0.89);
-  --os-glass-bg-strong: rgba(6, 10, 24, 0.92);
+  --os-glass-bg-strong: rgba(6, 10, 24, 0.486);
   --os-glass-blur: 20px;
   --os-glass-saturate: 1.2;
   --os-menubar-bg: rgba(6, 10, 22, 0.45);
@@ -120,7 +121,7 @@
   /* ——— Z-index scale ——— */
   --os-z-desktop: 0;
   --os-z-window: 10;
-  --os-z-dock: 40;
+  --os-z-dock: 9999;
   --os-z-menubar: 50;
   --os-z-overlay: 60;
 

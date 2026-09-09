@@ -95,33 +95,42 @@ export function calculateViewportAwarePosition(
 ): WindowBounds {
   const { x, y, width, height } = bounds;
 
+  // Clamp width and height to fit the available area (minus edge margins on both sides)
+  const maxWidth = Math.max(area.width - EDGE_MARGIN * 2, 240);
+  const maxHeight = Math.max(area.height - EDGE_MARGIN * 2, 180);
+  const clampedWidth = Math.min(width, maxWidth);
+  const clampedHeight = Math.min(height, maxHeight);
+
   // Start with the configured bounds
   let adjustedX = x;
   let adjustedY = y;
 
   // Horizontal fitting: only move left if the window would extend beyond right edge
-  const rightEdge = x + width;
+  const rightEdge = x + clampedWidth;
   if (rightEdge > area.width) {
     // Move left only as much as necessary to fit, preserving edge margin
-    adjustedX = Math.max(EDGE_MARGIN, area.width - width - EDGE_MARGIN);
+    adjustedX = Math.max(EDGE_MARGIN, area.width - clampedWidth - EDGE_MARGIN);
   }
 
   // Vertical fitting: only move up if the window would extend beyond bottom edge
-  const bottomEdge = y + height;
+  const bottomEdge = y + clampedHeight;
   if (bottomEdge > area.height) {
-    console.log({
-      bottomEdge,
-      final: area.height - height - EDGE_MARGIN,
-      area,
-      bounds,
-    });
     // Move up only as much as necessary to fit, preserving edge margin
-    adjustedY = Math.max(EDGE_MARGIN, area.height - height - EDGE_MARGIN);
+    adjustedY = Math.max(
+      EDGE_MARGIN,
+      area.height - clampedHeight - EDGE_MARGIN
+    );
   }
 
   // Apply clamping to ensure window remains accessible
   const clamped = clampWindowPosition(
-    { ...bounds, x: adjustedX, y: adjustedY },
+    {
+      ...bounds,
+      x: adjustedX,
+      y: adjustedY,
+      width: clampedWidth,
+      height: clampedHeight,
+    },
     area
   );
 

@@ -381,10 +381,10 @@ export function MenuBar() {
         <HelpMenu isOpen={activeMenu === "help"} onClose={closeMenu} />
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 sm:block">
-        <p className="inline-flex items-center gap-1.5 rounded-os-pill border border-os-border bg-black/25 px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-os-status">
+      <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 sm:flex">
+        <p className="inline-flex pt-1 items-center gap-1.5 rounded-os-pill border border-os-border bg-black/25 px-2.5 text-[0.55rem] font-medium tracking-wide text-os-status">
           <span
-            className="size-1.5 rounded-full bg-os-status shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+            className="size-1.5 rounded-full mb-0.5 bg-os-status shadow-[0_0_8px_rgba(52,211,153,0.8)]"
             aria-hidden="true"
           />
           OPEN TO OPPORTUNITIES
