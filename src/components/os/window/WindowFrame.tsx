@@ -231,50 +231,68 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
             if (!isCompact) toggleMaximize(managed.id);
           }}
         >
-          <div
-            className="os-window__controls"
-            onPointerDown={(event) => event.stopPropagation()}
-          >
+          {isCompact ? (
             <button
               type="button"
-              className="os-window__control os-window__control--close"
+              className="os-window__back"
               aria-label={`Close ${managed.title}`}
-              onClick={() => closeWindow(managed.id)}
-            />
-            <button
-              type="button"
-              className="os-window__control os-window__control--minimize"
-              aria-label={`Minimize ${managed.title}`}
-              onClick={() => minimizeWindow(managed.id)}
-            />
-            <button
-              type="button"
-              className="os-window__control os-window__control--maximize"
-              aria-label={
-                managed.isMaximized
-                  ? `Restore ${managed.title}`
-                  : `Maximize ${managed.title}`
-              }
-              onClick={() => {
-                if (!isCompact) toggleMaximize(managed.id);
+              onClick={(event) => {
+                event.stopPropagation();
+                closeWindow(managed.id);
               }}
-            />
-          </div>
-          <h2 className="os-window__title">{managed.title}</h2>
-          <span className="os-window__titlebar-spacer" aria-hidden="true" />
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          ) : (
+            <>
+              <div
+                className="os-window__controls"
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="os-window__control os-window__control--close"
+                  aria-label={`Close ${managed.title}`}
+                  onClick={() => closeWindow(managed.id)}
+                />
+                <button
+                  type="button"
+                  className="os-window__control os-window__control--minimize"
+                  aria-label={`Minimize ${managed.title}`}
+                  onClick={() => minimizeWindow(managed.id)}
+                />
+                <button
+                  type="button"
+                  className="os-window__control os-window__control--maximize"
+                  aria-label={
+                    managed.isMaximized
+                      ? `Restore ${managed.title}`
+                      : `Maximize ${managed.title}`
+                  }
+                  onClick={() => {
+                    if (!isCompact) toggleMaximize(managed.id);
+                  }}
+                />
+              </div>
+              <h2 className="os-window__title">{managed.title}</h2>
+              <span className="os-window__titlebar-spacer" aria-hidden="true" />
+            </>
+          )}
         </div>
       ) : null}
       <div className="os-window__body">{children}</div>
-      {isCompact && (
-        <button
-          type="button"
-          className="os-window__home-indicator"
-          aria-label="Back to Home Screen"
-          onClick={() => minimizeWindow(managed.id)}
-        >
-          <span className="os-window__home-indicator-bar" aria-hidden="true" />
-        </button>
-      )}
     </section>
   );
 }

@@ -39,10 +39,10 @@ export function BootSplash({ variant, onComplete }: BootSplashProps) {
     } else {
       // Desktop variant: shorter timing
       const timers = [
-        setTimeout(() => setStage(1), 150),
-        setTimeout(() => setStage(2), 600),
-        setTimeout(() => setStage(3), 1400),
-        setTimeout(() => onComplete(), 1800),
+        setTimeout(() => setStage(1), 200),
+        setTimeout(() => setStage(2), 1000),
+        setTimeout(() => setStage(3), 2300),
+        setTimeout(() => onComplete(), 2800),
       ];
       return () => timers.forEach(clearTimeout);
     }
@@ -50,7 +50,9 @@ export function BootSplash({ variant, onComplete }: BootSplashProps) {
 
   return (
     <div
-      className={`os-boot-splash${stage === (variant === "mobile" ? 5 : 3) ? " os-boot-splash--exit" : ""}`}
+      className={`os-boot-splash${
+        stage === (variant === "mobile" ? 5 : 3) ? " os-boot-splash--exit" : ""
+      }`}
     >
       {variant === "mobile" ? (
         <div className="os-boot-splash__content">
