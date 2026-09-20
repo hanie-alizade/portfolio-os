@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getDisplayedYearsOfExperience } from "@/lib/experience";
 
-const COFFEE_OVERFLOW = 500;
+const COFFEE_OVERFLOW = 120;
 const COFFEE_TICK_MS = 10;
 
 const PARTICLE_FRAGMENTS = [
@@ -242,14 +242,14 @@ export function SystemStatsWindowContent() {
 
             return current;
           }
-          return current + Math.floor(Math.random() * 8) + 4;
+          return current + Math.floor(Math.random() * 20) + 15;
         });
       }, COFFEE_TICK_MS);
 
       return () => window.clearInterval(id);
     };
 
-    const timer = setTimeout(startCoffee, 900);
+    const timer = setTimeout(startCoffee, 50);
     return () => {
       clearTimeout(timer);
     };

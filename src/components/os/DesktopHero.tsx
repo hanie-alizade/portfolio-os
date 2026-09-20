@@ -1,11 +1,45 @@
 "use client";
 
+import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { DesktopWidget } from "./DesktopWidget";
-import { TerminalWindowContent } from "./windows/TerminalWindowContent";
-import { SystemStatsWindowContent } from "./windows/SystemStatsWindowContent";
-import { StickyNoteWindowContent } from "./windows/StickyNoteWindowContent";
+
+const TerminalWindowContent = dynamic(
+  () =>
+    import("./windows/TerminalWindowContent").then(
+      (m) => m.TerminalWindowContent
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="os-window__body" aria-busy="true" />,
+  }
+);
+
+const SystemStatsWindowContent = dynamic(
+  () =>
+    import("./windows/SystemStatsWindowContent").then(
+      (m) => m.SystemStatsWindowContent
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="os-window__body" aria-busy="true" />,
+  }
+);
 
 export function DesktopHero() {
+  const [focusedWidget, setFocusedWidget] = useState<string>("terminal-widget");
+
+  const getWidgetZIndex = useCallback(
+    (id: string) => {
+      return focusedWidget === id ? 2 : 1;
+    },
+    [focusedWidget]
+  );
+
+  const handleWidgetFocus = useCallback((id: string) => {
+    setFocusedWidget(id);
+  }, []);
+
   return (
     <>
       <div className="os-desktop-hero">
@@ -22,6 +56,8 @@ export function DesktopHero() {
       <DesktopWidget
         id="terminal-widget"
         initialBounds={{ x: 2000, y: 420, width: 450, height: 145 }}
+        zIndex={getWidgetZIndex("terminal-widget")}
+        onFocus={() => handleWidgetFocus("terminal-widget")}
       >
         <TerminalWindowContent />
       </DesktopWidget>
@@ -29,6 +65,8 @@ export function DesktopHero() {
       <DesktopWidget
         id="system-stats-widget"
         initialBounds={{ x: 10, y: 350, width: 300, height: 360 }}
+        zIndex={getWidgetZIndex("system-stats-widget")}
+        onFocus={() => handleWidgetFocus("system-stats-widget")}
       >
         <SystemStatsWindowContent />
       </DesktopWidget>

@@ -43,7 +43,7 @@ function DesktopShellContent({ children }: { children?: ReactNode }) {
         )}
         <WindowLayer />
         {children}
-        {!isCompact && <Dock />}
+        <Dock />
       </main>
     </div>
   );
