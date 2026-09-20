@@ -13,20 +13,20 @@
 
   /* ——— Text ——— */
   --os-text: #f5f7ff;
-  --os-text-subtitle: #dccbff;
+  --os-text-subtitle: #cbd5e1;
   --os-text-muted: #b8bed4;
   --os-text-subtle: #8e95b0;
   --os-text-inverse: #0b1020;
 
-  /* ——— Accents (neon / glass UI) ——— */
-  --os-accent: #a855f7;
-  --os-accent-strong: #d946ef;
-  --os-accent-strong-light: #f1c3ff;
-  --os-accent-soft: rgba(168, 85, 247, 0.22);
-  --os-accent-border: rgba(169, 85, 247, 0.808);
-  --os-accent-glow: rgba(168, 85, 247, 0.45);
+  /* ——— Accents (chic dark mode) ——— */
+  --os-accent: #14b8a6;
+  --os-accent-strong: #2dd4bf;
+  --os-accent-strong-light: #99f6e4;
+  --os-accent-soft: rgba(20, 184, 166, 0.18);
+  --os-accent-border: rgba(20, 184, 166, 0.55);
+  --os-accent-glow: rgba(45, 212, 191, 0.3);
   --os-cyan: #22d3ee;
-  --os-pink: #f472b6;
+  --os-pink: #64748b;
   --os-green: #4ade80;
   --os-terminal: #86efac;
   --os-danger: #f43f5e;
@@ -37,24 +37,24 @@
   /* ——— Gradients ——— */
   --os-gradient-accent: linear-gradient(
     135deg,
-    #7c3aed 0%,
-    #a855f7 45%,
-    #d946ef 100%
+    #0d9488 0%,
+    #14b8a6 45%,
+    #2dd4bf 100%
   );
   --os-gradient-desktop: linear-gradient(
     180deg,
-    #0b1230 0%,
-    #070b1c 38%,
-    #040612 68%,
-    #01040e 100%
+    #0b1a24 0%,
+    #071018 38%,
+    #04090e 68%,
+    #010405 100%
   );
 
   /* ——— Borders ——— */
-  --os-border: rgba(255, 255, 255, 0.12);
-  --os-border-strong: rgba(196, 181, 253, 0.28);
-  --os-border-light: rgba(195, 181, 253, 0.438);
-  --os-border-accent: rgba(168, 85, 247, 0.45);
-  --os-border-accent2: rgba(123, 80, 243, 0.45);
+  --os-border: rgba(255, 255, 255, 0.1);
+  --os-border-strong: rgba(148, 163, 184, 0.28);
+  --os-border-light: rgba(148, 163, 184, 0.4);
+  --os-border-accent: rgba(20, 184, 166, 0.4);
+  --os-border-accent2: rgba(45, 212, 191, 0.4);
 
   /* ——— Glass ——— */
   --os-glass-bg-widget: rgba(8, 12, 28, 0.548);
@@ -72,8 +72,8 @@
     0 2px 0 rgba(255, 255, 255, 0.04) inset;
   --os-shadow-dock: 0 12px 40px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-  --os-shadow-glow: 0 0 24px var(--os-accent-glow);
-  --os-shadow-glow-strong: 0 0 36px rgba(217, 70, 239, 0.55);
+  --os-shadow-glow: 0 0 20px var(--os-accent-glow);
+  --os-shadow-glow-strong: 0 0 28px rgba(45, 212, 191, 0.4);
 
   /* ——— Radius ——— */
   --os-radius-sm: 0.5rem;

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-const PARTICLE_COUNT = 6;
-const MAX_TTL = 700;
-const SPEED = 1;
+const PARTICLE_COUNT = 60;
+const MAX_TTL = 10000;
+const SPEED = 0.2;
 const MOUSE_THRESHOLD = 100;
 const MOUSE_REPEL = 3;
 const MOUSE_LERP = 0.025; // (lerpAmt 2.5 / 100, matching the original tool's convention)

@@ -45,7 +45,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
     setWindowBounds,
   } = useWindowManager();
 
-  const frameRef = useRef<HTMLElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragSession | null>(null);
   const managedRef = useRef(managed);
   const setBoundsRef = useRef(setWindowBounds);
@@ -54,13 +54,51 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
   const isFocused = state.focusedId === managed.id;
   const canDrag =
     !isCompact && !managed.isMaximized && managed.chrome !== "widget";
-  const canDragWidget =
-    !isCompact && !managed.isMaximized && managed.chrome === "widget";
+
+  const [animationState, setAnimationState] = useState<
+    | "entering"
+    | "exiting"
+    | "minimizing"
+    | "restoring"
+    | "maximizing"
+    | "restoring-from-maximize"
+    | null
+  >("entering");
+  const prevManagedRef = useRef(managed);
+  const hasClearedInitialAnimation = useRef(false);
 
   useEffect(() => {
-    managedRef.current = managed;
     setBoundsRef.current = setWindowBounds;
-  }, [managed, setWindowBounds]);
+    managedRef.current = managed;
+  }, [setWindowBounds, managed]);
+
+  // Clear initial entering animation after mount
+  useEffect(() => {
+    if (!hasClearedInitialAnimation.current) {
+      hasClearedInitialAnimation.current = true;
+      const timer = setTimeout(() => setAnimationState(null), 200);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Handle window entering/exiting/minimizing/restoring animations
+  useEffect(() => {
+    const prev = prevManagedRef.current;
+    prevManagedRef.current = managed;
+
+    // Window just restored from minimized state
+    if (
+      managed.isOpen &&
+      !managed.isMinimized &&
+      prev.isMinimized &&
+      animationState === null
+    ) {
+      setAnimationState("restoring");
+      const timer = setTimeout(() => setAnimationState(null), 200);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [managed.isOpen, managed.isMinimized, animationState]);
 
   const applyTransform = useCallback((x: number, y: number) => {
     const node = frameRef.current;
@@ -119,7 +157,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
       }
 
       const node = frameRef.current;
-      node?.classList.remove("os-window--dragging");
+      node?.classList.remove("os-window__positioning--dragging");
       if (node?.hasPointerCapture(drag.pointerId)) {
         node.releasePointerCapture(drag.pointerId);
       }
@@ -166,8 +204,9 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
         latestY: current.bounds.y,
       };
 
-      frameRef.current?.classList.add("os-window--dragging");
-      frameRef.current?.setPointerCapture(pointerEvent.pointerId);
+      const node = frameRef.current;
+      node?.classList.add("os-window__positioning--dragging");
+      node?.setPointerCapture(pointerEvent.pointerId);
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("pointerup", endDrag);
       window.addEventListener("pointercancel", endDrag);
@@ -193,6 +232,38 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
     focusWindow(managed.id);
   };
 
+  const handleClose = () => {
+    setAnimationState("exiting");
+    setTimeout(() => {
+      closeWindow(managed.id);
+      setAnimationState(null);
+    }, 150);
+  };
+
+  const handleMinimize = () => {
+    setAnimationState("minimizing");
+    setTimeout(() => {
+      minimizeWindow(managed.id);
+      setAnimationState(null);
+    }, 180);
+  };
+
+  const handleMaximize = () => {
+    if (managed.isMaximized) {
+      setAnimationState("restoring-from-maximize");
+      setTimeout(() => {
+        toggleMaximize(managed.id);
+        setTimeout(() => setAnimationState(null), 120);
+      }, 16);
+    } else {
+      setAnimationState("maximizing");
+      setTimeout(() => {
+        toggleMaximize(managed.id);
+        setTimeout(() => setAnimationState(null), 120);
+      }, 16);
+    }
+  };
+
   const compactStyle =
     isCompact || managed.isMaximized
       ? {
@@ -207,11 +278,9 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
         };
 
   return (
-    <section
+    <div
       ref={frameRef}
-      className={`os-window os-window--${managed.chrome}${
-        isFocused ? " os-window--focused" : ""
-      }${isCompact || managed.isMaximized ? " os-window--maximized" : ""}`}
+      className="os-window__positioning"
       style={{
         zIndex: managed.zIndex,
         ...compactStyle,
@@ -220,79 +289,90 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
       data-window-id={managed.id}
       onPointerDown={() => focusWindow(managed.id)}
     >
-      {managed.chrome !== "widget" ? (
-        <div
-          className={`os-window__titlebar${
-            canDrag ? " os-window__titlebar--draggable" : ""
-          }`}
-          style={{ height: TITLEBAR_HEIGHT }}
-          onPointerDown={onTitlePointerDown}
-          onDoubleClick={() => {
-            if (!isCompact) toggleMaximize(managed.id);
-          }}
-        >
-          {isCompact ? (
-            <button
-              type="button"
-              className="os-window__back"
-              aria-label={`Close ${managed.title}`}
-              onClick={(event) => {
-                event.stopPropagation();
-                closeWindow(managed.id);
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+      <section
+        className={`os-window os-window--${managed.chrome}${
+          isFocused ? " os-window--focused" : ""
+        }${isCompact || managed.isMaximized ? " os-window--maximized" : ""}${
+          animationState ? ` os-window--${animationState}` : ""
+        }`}
+      >
+        {managed.chrome !== "widget" ? (
+          <div
+            className={`os-window__titlebar${
+              canDrag ? " os-window__titlebar--draggable" : ""
+            }`}
+            style={{ height: TITLEBAR_HEIGHT }}
+            onPointerDown={onTitlePointerDown}
+            onDoubleClick={() => {
+              if (!isCompact) handleMaximize();
+            }}
+          >
+            {isCompact ? (
+              <button
+                type="button"
+                className="os-window__back"
+                aria-label={`Close ${managed.title}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleClose();
+                }}
               >
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-          ) : (
-            <>
-              <div
-                className="os-window__controls"
-                onPointerDown={(event) => event.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  className="os-window__control os-window__control--close"
-                  aria-label={`Close ${managed.title}`}
-                  onClick={() => closeWindow(managed.id)}
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            ) : (
+              <>
+                <div
+                  className="os-window__controls"
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="os-window__control os-window__control--close"
+                    aria-label={`Close ${managed.title}`}
+                    onClick={() => handleClose()}
+                  />
+                  <button
+                    type="button"
+                    className="os-window__control os-window__control--minimize"
+                    aria-label={`Minimize ${managed.title}`}
+                    onClick={() => handleMinimize()}
+                  />
+                  <button
+                    type="button"
+                    className="os-window__control os-window__control--maximize"
+                    aria-label={
+                      managed.isMaximized
+                        ? `Restore ${managed.title}`
+                        : `Maximize ${managed.title}`
+                    }
+                    onClick={() => {
+                      if (!isCompact) handleMaximize();
+                    }}
+                  />
+                </div>
+                <h2 className="os-window__title">{managed.title}</h2>
+                <span
+                  className="os-window__titlebar-spacer"
+                  aria-hidden="true"
                 />
-                <button
-                  type="button"
-                  className="os-window__control os-window__control--minimize"
-                  aria-label={`Minimize ${managed.title}`}
-                  onClick={() => minimizeWindow(managed.id)}
-                />
-                <button
-                  type="button"
-                  className="os-window__control os-window__control--maximize"
-                  aria-label={
-                    managed.isMaximized
-                      ? `Restore ${managed.title}`
-                      : `Maximize ${managed.title}`
-                  }
-                  onClick={() => {
-                    if (!isCompact) toggleMaximize(managed.id);
-                  }}
-                />
-              </div>
-              <h2 className="os-window__title">{managed.title}</h2>
-              <span className="os-window__titlebar-spacer" aria-hidden="true" />
-            </>
-          )}
-        </div>
-      ) : null}
-      <div className="os-window__body">{children}</div>
-    </section>
+              </>
+            )}
+          </div>
+        ) : null}
+        <div className="os-window__body">{children}</div>
+      </section>
+    </div>
   );
 }

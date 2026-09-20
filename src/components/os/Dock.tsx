@@ -15,7 +15,7 @@ import { dockApps } from "./dockApps";
 import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
 
 const BASE_SIZE = 44;
-const MAX_SIZE = 70;
+const MAX_SIZE = 64;
 
 function DockIcon({
   app,
@@ -75,8 +75,8 @@ function DockIcon({
           <Image
             src={app.icon}
             alt=""
-            width={BASE_SIZE}
-            height={BASE_SIZE}
+            width={MAX_SIZE}
+            height={MAX_SIZE}
             className="os-dock-item__icon"
           />
         </div>
@@ -109,8 +109,8 @@ function DockIcon({
         <Image
           src={app.icon}
           alt=""
-          width={BASE_SIZE}
-          height={BASE_SIZE}
+          width={MAX_SIZE}
+          height={MAX_SIZE}
           className="os-dock-item__icon"
         />
       </motion.div>
