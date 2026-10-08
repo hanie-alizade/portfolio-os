@@ -1,4 +1,3 @@
-"use client";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 import type { DockAppId } from "@/components/os/appIds";
 

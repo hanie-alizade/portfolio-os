@@ -1,9 +1,4 @@
-import type {
-  CreateWindowInput,
-  ManagedWindow,
-  WindowBounds,
-  WindowId,
-} from "./types";
+import type { CreateWindowInput, ManagedWindow, WindowBounds, WindowId } from "./types";
 
 export const TITLEBAR_HEIGHT = 36;
 export const MIN_VISIBLE_EDGE = 72;
@@ -14,10 +9,6 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 export function getDesktopAreaSize() {
-  if (typeof document === "undefined" || typeof window === "undefined") {
-    return { width: 1920, height: 1080 };
-  }
-
   const area = document.getElementById("desktop-area");
   if (!area) {
     return {
@@ -47,10 +38,7 @@ export function clampWindowPosition(
   };
 }
 
-export function createManagedWindow(
-  input: CreateWindowInput,
-  zIndex: number
-): ManagedWindow {
+export function createManagedWindow(input: CreateWindowInput, zIndex: number): ManagedWindow {
   return {
     id: input.id,
     appId: input.appId,
@@ -91,7 +79,7 @@ export function findWindowIdByApp(
 export function calculateViewportAwarePosition(
   bounds: WindowBounds,
   area: { width: number; height: number },
-  referenceBounds: WindowBounds
+  _referenceBounds: WindowBounds
 ): WindowBounds {
   const { x, y, width, height } = bounds;
 
@@ -116,10 +104,7 @@ export function calculateViewportAwarePosition(
   const bottomEdge = y + clampedHeight;
   if (bottomEdge > area.height) {
     // Move up only as much as necessary to fit, preserving edge margin
-    adjustedY = Math.max(
-      EDGE_MARGIN,
-      area.height - clampedHeight - EDGE_MARGIN
-    );
+    adjustedY = Math.max(EDGE_MARGIN, area.height - clampedHeight - EDGE_MARGIN);
   }
 
   // Apply clamping to ensure window remains accessible
@@ -137,9 +122,7 @@ export function calculateViewportAwarePosition(
   return clamped;
 }
 
-export function getReferenceCompositionBounds(
-  windows: CreateWindowInput[]
-): WindowBounds {
+export function getReferenceCompositionBounds(windows: CreateWindowInput[]): WindowBounds {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;

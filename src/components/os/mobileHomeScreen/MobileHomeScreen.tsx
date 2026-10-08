@@ -1,18 +1,11 @@
-"use client";
-import Image from "next/image";
-import dynamic from "next/dynamic";
+import { Suspense, lazy } from "react";
 import { dockApps } from "@/components/os/dockApps";
 import { useMobileAppLauncher } from "./useMobileAppLauncher";
 
-const SystemStatsWindowContent = dynamic(
-  () =>
-    import("@/components/os/windows/SystemStatsWindowContent").then(
-      (m) => m.SystemStatsWindowContent
-    ),
-  {
-    ssr: false,
-    loading: () => <div className="os-window__body" aria-busy="true" />,
-  }
+const SystemStatsWindowContent = lazy(() =>
+  import("@/components/os/windows/SystemStatsWindowContent").then((m) => ({
+    default: m.SystemStatsWindowContent,
+  }))
 );
 
 export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
@@ -24,7 +17,11 @@ export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
   return (
     <div className={`os-mobile-home${hidden ? " os-mobile-home--hidden" : ""}`}>
       <div className="os-mobile-home__widget">
-        <SystemStatsWindowContent />
+        <Suspense
+          fallback={<div className="os-window__body" aria-busy="true" />}
+        >
+          <SystemStatsWindowContent />
+        </Suspense>
       </div>
 
       <div className="os-mobile-home__grid" role="list">
@@ -41,7 +38,14 @@ export function MobileHomeScreen({ hidden }: { hidden?: boolean }) {
               onClick={() => launch(app.id)}
             >
               <span className="os-mobile-home__app-icon">
-                <Image src={app.icon} alt="" width={48} height={48} />
+                <img
+                  src={app.icon}
+                  alt=""
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                  decoding="async"
+                />
               </span>
               <span className="os-mobile-home__app-label">{app.label}</span>
             </button>

@@ -1,20 +1,12 @@
-"use client";
-
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { SystemClock } from "@/components/os/SystemClock";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 import { useMenuBar } from "@/components/os/MenuBarContext";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const SKILLS = {
-  Frontend: [
-    "React",
-    "TypeScript",
-    "Next.js",
-    "Tailwind CSS",
-    "Motion",
-    "Svelte",
-  ],
+  Frontend: ["React", "TypeScript", "Next.js", "Tailwind CSS", "Motion", "Svelte"],
   "Architecture & Systems": [
     "Microfrontends",
     "Module Federation",
@@ -39,26 +31,12 @@ function TrayIcon({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function SkillsDropdown({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+function SkillsDropdown({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [shouldRender, setShouldRender] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const [hoverTimeout, setHoverTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -134,9 +112,7 @@ function SkillsDropdown({
               {openCategory === category && (
                 <div
                   className={`os-menu-dropdown os-menu-dropdown--submenu ${
-                    hasEntered && !reducedMotion
-                      ? "os-menu-dropdown--enter"
-                      : ""
+                    hasEntered && !reducedMotion ? "os-menu-dropdown--enter" : ""
                   }`}
                   style={{
                     position: "absolute",
@@ -169,14 +145,8 @@ function SkillsDropdown({
   );
 }
 
-function WindowMenu({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const { state, focusWindow, openWindow } = useWindowManager();
+function WindowMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { state, focusWindow } = useWindowManager();
   const [shouldRender, setShouldRender] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -242,13 +212,7 @@ function WindowMenu({
   );
 }
 
-function HelpMenu({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+function HelpMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [shouldRender, setShouldRender] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -299,27 +263,20 @@ function HelpMenu({
 
 function DynamicIsland() {
   const { state } = useWindowManager();
-  const activeWindow = Object.values(state.windows).find(
-    (w) => w.isOpen && !w.isMinimized
-  );
+  const activeWindow = Object.values(state.windows).find((w) => w.isOpen && !w.isMinimized);
 
   return (
     <div
-      className={`os-dynamic-island${
-        activeWindow ? " os-dynamic-island--active" : ""
-      }`}
+      className={`os-dynamic-island${activeWindow ? " os-dynamic-island--active" : ""}`}
       aria-live="polite"
     >
-      {activeWindow ? (
-        <span className="os-dynamic-island__label">{activeWindow.title}</span>
-      ) : null}
+      {activeWindow ? <span className="os-dynamic-island__label">{activeWindow.title}</span> : null}
     </div>
   );
 }
 
 export function MenuBar() {
   const { activeMenu, openMenu, closeMenu } = useMenuBar();
-  const { openWindow } = useWindowManager();
 
   const toggleMenu = useCallback(
     (menu: string) => {
@@ -335,13 +292,8 @@ export function MenuBar() {
   return (
     <header className="os-menubar" role="banner">
       <div className="flex min-w-0 items-center gap-os-3">
-        <span className="shrink-0 text-xs font-semibold tracking-tight text-os-text">
-          Hanie OS
-        </span>
-        <nav
-          className="hidden items-center gap-os-3 md:flex"
-          aria-label="System menu"
-        >
+        <span className="shrink-0 text-xs font-semibold tracking-tight text-os-text">Hanie OS</span>
+        <nav className="hidden items-center gap-os-3 md:flex" aria-label="System menu">
           <button
             type="button"
             className={`rounded-os-sm px-1 py-0.5 text-os-xs transition-colors hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none ${
@@ -396,10 +348,7 @@ export function MenuBar() {
       </div>
 
       <div className="flex shrink-0 items-center gap-os-2 sm:gap-os-3">
-        <div
-          className="hidden items-center gap-os-2 sm:flex"
-          aria-hidden="true"
-        >
+        <div className="hidden items-center gap-os-2 sm:flex" aria-hidden="true">
           <TrayIcon label="Network">
             <svg
               viewBox="0 0 24 24"
@@ -411,13 +360,7 @@ export function MenuBar() {
               <path d="M2 8.5c6-5 14-5 20 0" />
               <path d="M5.5 12c4-3.5 9-3.5 13 0" />
               <path d="M9 15.5c2.2-1.8 3.8-1.8 6 0" />
-              <circle
-                cx="12"
-                cy="18.5"
-                r="1.1"
-                fill="currentColor"
-                stroke="none"
-              />
+              <circle cx="12" cy="18.5" r="1.1" fill="currentColor" stroke="none" />
             </svg>
           </TrayIcon>
           <TrayIcon label="Volume">

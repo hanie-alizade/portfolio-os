@@ -1,29 +1,16 @@
-"use client";
 
-import { useState, useCallback } from "react";
-import dynamic from "next/dynamic";
+import { useState, useCallback, Suspense, lazy } from "react";
 import { DesktopWidget } from "./DesktopWidget";
 
-const TerminalWindowContent = dynamic(
-  () =>
-    import("./windows/TerminalWindowContent").then(
-      (m) => m.TerminalWindowContent
-    ),
-  {
-    ssr: false,
-    loading: () => <div className="os-window__body" aria-busy="true" />,
-  }
+const TerminalWindowContent = lazy(() =>
+  import("./windows/TerminalWindowContent").then((m) => ({
+    default: m.TerminalWindowContent,
+  }))
 );
-
-const SystemStatsWindowContent = dynamic(
-  () =>
-    import("./windows/SystemStatsWindowContent").then(
-      (m) => m.SystemStatsWindowContent
-    ),
-  {
-    ssr: false,
-    loading: () => <div className="os-window__body" aria-busy="true" />,
-  }
+const SystemStatsWindowContent = lazy(() =>
+  import("./windows/SystemStatsWindowContent").then((m) => ({
+    default: m.SystemStatsWindowContent,
+  }))
 );
 
 export function DesktopHero() {
@@ -59,7 +46,11 @@ export function DesktopHero() {
         zIndex={getWidgetZIndex("terminal-widget")}
         onFocus={() => handleWidgetFocus("terminal-widget")}
       >
-        <TerminalWindowContent />
+        <Suspense
+          fallback={<div className="os-window__body" aria-busy="true" />}
+        >
+          <TerminalWindowContent />
+        </Suspense>
       </DesktopWidget>
 
       <DesktopWidget
@@ -68,7 +59,11 @@ export function DesktopHero() {
         zIndex={getWidgetZIndex("system-stats-widget")}
         onFocus={() => handleWidgetFocus("system-stats-widget")}
       >
-        <SystemStatsWindowContent />
+        <Suspense
+          fallback={<div className="os-window__body" aria-busy="true" />}
+        >
+          <SystemStatsWindowContent />
+        </Suspense>
       </DesktopWidget>
 
       {/* <DesktopWidget

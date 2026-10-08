@@ -1,5 +1,3 @@
-"use client";
-
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 
 const EXPERIENCE = [
@@ -56,13 +54,11 @@ export function ExperienceWindowContent() {
       <header className="os-experience__header">
         <p className="os-eyebrow">Career Timeline</p>
         <h3 className="os-window-heading">Experience</h3>
-        <p className="os-window-copy">
-          My journey building frontend systems and interfaces.
-        </p>
+        <p className="os-window-copy">My journey building frontend systems and interfaces.</p>
       </header>
 
       <div className="os-experience__timeline">
-        {EXPERIENCE.map((job, index) => (
+        {EXPERIENCE.map((job) => (
           <article key={job.company} className="os-experience__item">
             <div className="os-experience__marker" />
             <div className="os-experience__content">
@@ -73,20 +69,14 @@ export function ExperienceWindowContent() {
               </div>
               <ul className="os-experience__achievements">
                 {job.achievements.map((achievement, idx) => {
-                  if (
-                    achievement ===
-                    "Also designed the platform's microfrontend architecture."
-                  ) {
+                  if (achievement === "Also designed the platform's microfrontend architecture.") {
                     return (
                       <li key={idx}>
-                        Also designed the platform's microfrontend architecture
-                        —{" "}
+                        Also designed the platform&apos;s microfrontend architecture —{" "}
                         <button
                           type="button"
                           className="os-experience__case-study-link"
-                          onClick={() =>
-                            openWindow("case-studies", { caseStudyId: "01" })
-                          }
+                          onClick={() => openWindow("case-studies", { caseStudyId: "01" })}
                           aria-label="View case study: Enterprise Microfrontend Architecture"
                         >
                           see the full case study →
@@ -94,19 +84,14 @@ export function ExperienceWindowContent() {
                       </li>
                     );
                   }
-                  if (
-                    achievement ===
-                    "Also built a custom gRPC debug panel for the platform."
-                  ) {
+                  if (achievement === "Also built a custom gRPC debug panel for the platform.") {
                     return (
                       <li key={idx}>
                         Also built a custom gRPC debug panel for the platform —{" "}
                         <button
                           type="button"
                           className="os-experience__case-study-link"
-                          onClick={() =>
-                            openWindow("case-studies", { caseStudyId: "02" })
-                          }
+                          onClick={() => openWindow("case-studies", { caseStudyId: "02" })}
                           aria-label="View case study: Custom gRPC Debug Panel"
                         >
                           see the full case study →
@@ -114,19 +99,14 @@ export function ExperienceWindowContent() {
                       </li>
                     );
                   }
-                  if (
-                    achievement ===
-                    "Also built a schema-driven dynamic form system."
-                  ) {
+                  if (achievement === "Also built a schema-driven dynamic form system.") {
                     return (
                       <li key={idx}>
                         Also built a schema-driven dynamic form system —{" "}
                         <button
                           type="button"
                           className="os-experience__case-study-link"
-                          onClick={() =>
-                            openWindow("case-studies", { caseStudyId: "03" })
-                          }
+                          onClick={() => openWindow("case-studies", { caseStudyId: "03" })}
                           aria-label="View case study: Schema-Driven Dynamic Form System"
                         >
                           see the full case study →

@@ -1,7 +1,6 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { getDisplayedYearsOfExperience } from "@/lib/experience";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const COFFEE_OVERFLOW = 120;
 const COFFEE_TICK_MS = 10;
@@ -18,18 +17,6 @@ const PARTICLE_FRAGMENTS = [
   "CA",
   "FE",
 ] as const;
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return reduced;
-}
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
@@ -113,25 +100,12 @@ const GRAPH_DATA = {
 function toJaggedPath(points: readonly number[]): string {
   const stepX = 160 / (points.length - 1);
   return points
-    .map(
-      (y, i) =>
-        `${i === 0 ? "M" : "L"}${(i * stepX).toFixed(1)} ${y.toFixed(1)}`
-    )
+    .map((y, i) => `${i === 0 ? "M" : "L"}${(i * stepX).toFixed(1)} ${y.toFixed(1)}`)
     .join(" ");
 }
 
-function StatGraph({
-  color,
-  shape,
-  isUnstable = false,
-}: {
-  color: string;
-  shape: readonly number[];
-  isUnstable?: boolean;
-}) {
-  const reducedMotion = usePrefersReducedMotion();
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => setAnimate(!reducedMotion), [reducedMotion]);
+function StatGraph({ color, shape }: { color: string; shape: readonly number[] }) {
+  const animate = !usePrefersReducedMotion();
 
   return (
     <svg
@@ -170,9 +144,7 @@ function CoffeeParticles() {
 
       if (isText) {
         particle.textContent =
-          PARTICLE_FRAGMENTS[
-            Math.floor(Math.random() * PARTICLE_FRAGMENTS.length)
-          ];
+          PARTICLE_FRAGMENTS[Math.floor(Math.random() * PARTICLE_FRAGMENTS.length)];
         particle.className = "os-coffee-particle os-coffee-particle--text";
       } else {
         particle.className = "os-coffee-particle os-coffee-particle--rect";
@@ -201,13 +173,7 @@ function CoffeeParticles() {
     };
   }, [reducedMotion]);
 
-  return (
-    <div
-      ref={particlesRef}
-      className="os-coffee-effect__particles"
-      aria-hidden="true"
-    />
-  );
+  return <div ref={particlesRef} className="os-coffee-effect__particles" aria-hidden="true" />;
 }
 
 export function SystemStatsWindowContent() {
@@ -322,14 +288,10 @@ export function SystemStatsWindowContent() {
           <div className="os-stats__label">COFFEE</div>
           {overflow ? (
             <div className="os-stats__coffee-overflow">
-              <span className="os-stats__value os-stats__value--error">
-                COFFEE OVERFLOW
-              </span>
+              <span className="os-stats__value os-stats__value--error">COFFEE OVERFLOW</span>
             </div>
           ) : (
-            <div className="os-stats__value os-stats__value--coffee">
-              {coffee}
-            </div>
+            <div className="os-stats__value os-stats__value--coffee">{coffee}</div>
           )}
           <div className="os-stats__sub">
             {overflow ? "Too much caffeine detected." : "Keep grinding!"}
@@ -338,11 +300,7 @@ export function SystemStatsWindowContent() {
           {overflow && <div className="os-coffee-effect__flash" />}
         </div>
         <div className="os-stats__graph-container">
-          <StatGraph
-            color="var(--os-danger)"
-            shape={GRAPH_DATA.coffee}
-            isUnstable={true}
-          />
+          <StatGraph color="var(--os-danger)" shape={GRAPH_DATA.coffee} />
         </div>
       </div>
     </div>

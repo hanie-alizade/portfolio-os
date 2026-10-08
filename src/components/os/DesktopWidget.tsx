@@ -1,13 +1,4 @@
-"use client";
-
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   calculateViewportAwarePosition,
   clampWindowPosition,
@@ -48,7 +39,6 @@ export function DesktopWidget({
   const boundsRef = useRef(initialBounds);
   const onFocusRef = useRef(onFocus);
   const [bounds, setBounds] = useState(() => {
-    if (typeof window === "undefined") return initialBounds;
     const area = getDesktopAreaSize();
     return calculateViewportAwarePosition(initialBounds, area, initialBounds);
   });

@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const GAMES = [
   {
     id: "find-bug",
@@ -53,16 +51,7 @@ export function LetsPlayWindowContent() {
             START GAME
           </button>
         </div>
-        <div className="os-window-content__media os-window-content__media--plain os-play__arcade">
-          <Image
-            src="/os/lets-play.png"
-            alt="Neon arcade cabinet illustration"
-            width={1536}
-            height={1024}
-            className="os-window-media-image"
-            loading="lazy"
-          />
-        </div>
+        <div className="os-window-content__media os-window-content__media--plain os-play__arcade" />
       </div>
     </div>
   );
