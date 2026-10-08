@@ -76,7 +76,7 @@ export function NdaWindowContent() {
       </div>
       <div className="os-window-content__media os-window-content__media--plain os-nda__media">
         <Image
-          src="/os/nda-vault.png"
+          src="/os/nda-vault.webp"
           alt="Stylized vault door representing NDA-protected work"
           width={1536}
           height={1024}

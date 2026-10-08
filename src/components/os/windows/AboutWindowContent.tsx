@@ -79,7 +79,7 @@ export function AboutWindowContent() {
 
       <div className="os-window-content__media os-window-content__media--plain">
         <Image
-          src="/os/about-desktop.png"
+          src="/os/about-desktop.webp"
           alt="Abstract geometric network visualization"
           width={1536}
           height={1024}

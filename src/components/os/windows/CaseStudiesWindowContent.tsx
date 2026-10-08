@@ -52,7 +52,7 @@ const CASE_STUDIES: CaseStudy[] = [
       "JWT",
     ],
     icon: Network,
-    image: "/os/case-study.png",
+    image: "/os/case-study.webp",
     situation: (
       <>
         A large enterprise platform was being operated as a{" "}
@@ -94,7 +94,7 @@ const CASE_STUDIES: CaseStudy[] = [
       "A custom internal tool that made gRPC traffic as easy to debug as REST.",
     tags: ["gRPC", "Debugging", "Development Tool", "Logging"],
     icon: Terminal,
-    image: "/os/case-study.png",
+    image: "/os/case-study.webp",
     situation: (
       <>
         The development and staging team had no convenient way to inspect{" "}
@@ -129,7 +129,7 @@ const CASE_STUDIES: CaseStudy[] = [
       "A schema-driven form system that allowed the frontend to adapt to Zendesk form configuration without code changes.",
     tags: ["Zendesk", "Schema-driven UI", "Dynamic Forms", "React Native"],
     icon: FileJson,
-    image: "/os/case-study.png",
+    image: "/os/case-study.webp",
     situation: (
       <>
         Ticketing was handled through <strong>Zendesk</strong>, with five ticket
@@ -184,7 +184,7 @@ const CASE_STUDIES: CaseStudy[] = [
       "Cross-App Communication",
     ],
     icon: Radio,
-    image: "/os/case-study.png",
+    image: "/os/case-study.webp",
     situation: (
       <>
         Espad&apos;s platform was composed of several{" "}
@@ -261,7 +261,7 @@ const CASE_STUDIES: CaseStudy[] = [
       "Session Replay",
     ],
     icon: Activity,
-    image: "/os/case-study.png",
+    image: "/os/case-study.webp",
     situation: (
       <>
         Boxy&apos;s production React app had error tracking, but similar-looking
