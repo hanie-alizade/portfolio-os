@@ -1,5 +1,3 @@
-"use client";
-
 import {
   createContext,
   useCallback,
@@ -49,31 +47,15 @@ function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
   let focusedId: WindowId | null = null;
   const pendingPayloads: Partial<Record<WindowId, unknown>> = {};
 
-  const isSSR =
-    typeof document === "undefined" || typeof window === "undefined";
-
-  const compact = !isSSR && isCompactViewport();
+  const compact = isCompactViewport();
 
   for (const input of inputs) {
     topZ += 1;
-    const bounds = isSSR
-      ? input.bounds
-      : (() => {
-          const referenceBounds = getReferenceCompositionBounds(inputs);
-          const desktopArea = getDesktopAreaSize();
-          return calculateViewportAwarePosition(
-            input.bounds,
-            desktopArea,
-            referenceBounds
-          );
-        })();
-    const resolvedIsOpen = compact
-      ? input.isOpenOnMobile ?? false
-      : input.isOpen ?? true;
-    windows[input.id] = createManagedWindow(
-      { ...input, bounds, isOpen: resolvedIsOpen },
-      topZ
-    );
+    const referenceBounds = getReferenceCompositionBounds(inputs);
+    const desktopArea = getDesktopAreaSize();
+    const bounds = calculateViewportAwarePosition(input.bounds, desktopArea, referenceBounds);
+    const resolvedIsOpen = compact ? (input.isOpenOnMobile ?? false) : (input.isOpen ?? true);
+    windows[input.id] = createManagedWindow({ ...input, bounds, isOpen: resolvedIsOpen }, topZ);
     windowOrder.push(input.id);
     if (resolvedIsOpen && !input.isMinimized) {
       focusedId = input.id;
@@ -83,10 +65,7 @@ function buildInitialState(inputs: CreateWindowInput[]): WindowManagerSnapshot {
   return { windows, windowOrder, focusedId, topZ, pendingPayloads };
 }
 
-function focusWindowState(
-  state: WindowManagerSnapshot,
-  id: WindowId
-): WindowManagerSnapshot {
+function focusWindowState(state: WindowManagerSnapshot, id: WindowId): WindowManagerSnapshot {
   const current = state.windows[id];
   if (!current || !current.isOpen) return state;
 
@@ -106,10 +85,7 @@ function focusWindowState(
   };
 }
 
-function reducer(
-  state: WindowManagerSnapshot,
-  action: Action
-): WindowManagerSnapshot {
+function reducer(state: WindowManagerSnapshot, action: Action): WindowManagerSnapshot {
   switch (action.type) {
     case "FOCUS":
       return focusWindowState(state, action.id);
@@ -131,9 +107,9 @@ function reducer(
 
       const focusedId =
         state.focusedId === action.id
-          ? Object.values(windows)
+          ? (Object.values(windows)
               .filter((window) => window.isOpen && !window.isMinimized)
-              .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null
+              .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null)
           : state.focusedId;
 
       return { ...state, windows, focusedId };
@@ -150,9 +126,9 @@ function reducer(
 
       const focusedId =
         state.focusedId === action.id
-          ? Object.values(windows)
+          ? (Object.values(windows)
               .filter((window) => window.isOpen && !window.isMinimized)
-              .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null
+              .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null)
           : state.focusedId;
 
       return { ...state, windows, focusedId };
@@ -169,9 +145,7 @@ function reducer(
       const topZ = state.topZ + 1;
 
       if (current.isMaximized) {
-        const restored = clampWindowPosition(
-          current.restoreBounds ?? current.bounds
-        );
+        const restored = clampWindowPosition(current.restoreBounds ?? current.bounds);
         return {
           ...state,
           focusedId: action.id,
@@ -232,7 +206,7 @@ function reducer(
       }
 
       const topZ = state.topZ + 1;
-      const compact = typeof window !== "undefined" && isCompactViewport();
+      const compact = isCompactViewport();
 
       return {
         ...state,
@@ -299,11 +273,7 @@ type WindowManagerApi = {
 const WindowManagerContext = createContext<WindowManagerApi | null>(null);
 
 export function WindowManagerProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(
-    reducer,
-    INITIAL_WINDOWS,
-    buildInitialState
-  );
+  const [state, dispatch] = useReducer(reducer, INITIAL_WINDOWS, buildInitialState);
 
   const hasInitializedPositions = useRef(false);
 
@@ -400,19 +370,13 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     ]
   );
 
-  return (
-    <WindowManagerContext.Provider value={api}>
-      {children}
-    </WindowManagerContext.Provider>
-  );
+  return <WindowManagerContext.Provider value={api}>{children}</WindowManagerContext.Provider>;
 }
 
 export function useWindowManager() {
   const context = useContext(WindowManagerContext);
   if (!context) {
-    throw new Error(
-      "useWindowManager must be used within WindowManagerProvider"
-    );
+    throw new Error("useWindowManager must be used within WindowManagerProvider");
   }
   return context;
 }

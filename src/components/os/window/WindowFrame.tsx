@@ -1,5 +1,3 @@
-"use client";
-
 import {
   useCallback,
   useEffect,
@@ -8,14 +6,11 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import {
-  clampWindowPosition,
-  getDesktopAreaSize,
-  TITLEBAR_HEIGHT,
-} from "./geometry";
+import { clampWindowPosition, getDesktopAreaSize, TITLEBAR_HEIGHT } from "./geometry";
 import type { ManagedWindow } from "./types";
 import { useWindowManager } from "./WindowManagerContext";
 import { useIsCompactViewport } from "@/hooks/useIsCompactViewport";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 type WindowFrameProps = {
   window: ManagedWindow;
@@ -36,14 +31,8 @@ type DragSession = {
 };
 
 export function WindowFrame({ window: managed, children }: WindowFrameProps) {
-  const {
-    state,
-    focusWindow,
-    closeWindow,
-    minimizeWindow,
-    toggleMaximize,
-    setWindowBounds,
-  } = useWindowManager();
+  const { state, focusWindow, closeWindow, minimizeWindow, toggleMaximize, setWindowBounds } =
+    useWindowManager();
 
   const frameRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragSession | null>(null);
@@ -52,8 +41,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
 
   const isCompact = useIsCompactViewport();
   const isFocused = state.focusedId === managed.id;
-  const canDrag =
-    !isCompact && !managed.isMaximized && managed.chrome !== "widget";
+  const canDrag = !isCompact && !managed.isMaximized && managed.chrome !== "widget";
 
   const [animationState, setAnimationState] = useState<
     | "entering"
@@ -66,6 +54,8 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
   >("entering");
   const prevManagedRef = useRef(managed);
   const hasClearedInitialAnimation = useRef(false);
+  const wasInteractivelyOpenRef = useRef(managed.isOpen && !managed.isMinimized);
+  const titleId = `${managed.id}-title`;
 
   useEffect(() => {
     setBoundsRef.current = setWindowBounds;
@@ -81,18 +71,22 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
     }
   }, []);
 
+  useEffect(() => {
+    const isVisible = managed.isOpen && !managed.isMinimized;
+    const wasVisible = wasInteractivelyOpenRef.current;
+    wasInteractivelyOpenRef.current = isVisible;
+    if (!wasVisible && isVisible && managed.chrome !== "widget") {
+      frameRef.current?.focus();
+    }
+  }, [managed.isOpen, managed.isMinimized, managed.chrome]);
+
   // Handle window entering/exiting/minimizing/restoring animations
   useEffect(() => {
     const prev = prevManagedRef.current;
     prevManagedRef.current = managed;
 
     // Window just restored from minimized state
-    if (
-      managed.isOpen &&
-      !managed.isMinimized &&
-      prev.isMinimized &&
-      animationState === null
-    ) {
+    if (managed.isOpen && !managed.isMinimized && prev.isMinimized && animationState === null) {
       setAnimationState("restoring");
       const timer = setTimeout(() => setAnimationState(null), 200);
       return () => clearTimeout(timer);
@@ -113,13 +107,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
       return;
     }
     applyTransform(managed.bounds.x, managed.bounds.y);
-  }, [
-    managed.bounds.x,
-    managed.bounds.y,
-    managed.isMaximized,
-    isCompact,
-    applyTransform,
-  ]);
+  }, [managed.bounds.x, managed.bounds.y, managed.isMaximized, isCompact, applyTransform]);
 
   useEffect(() => {
     const onPointerMove = (event: PointerEvent) => {
@@ -285,6 +273,10 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
         zIndex: managed.zIndex,
         ...compactStyle,
       }}
+      tabIndex={managed.chrome === "widget" ? undefined : -1}
+      role={managed.chrome === "widget" ? undefined : "dialog"}
+      aria-modal={managed.chrome === "widget" ? undefined : "false"}
+      aria-labelledby={managed.chrome === "widget" ? undefined : titleId}
       aria-label={managed.title}
       data-window-id={managed.id}
       onPointerDown={() => focusWindow(managed.id)}
@@ -298,9 +290,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
       >
         {managed.chrome !== "widget" ? (
           <div
-            className={`os-window__titlebar${
-              canDrag ? " os-window__titlebar--draggable" : ""
-            }`}
+            className={`os-window__titlebar${canDrag ? " os-window__titlebar--draggable" : ""}`}
             style={{ height: TITLEBAR_HEIGHT }}
             onPointerDown={onTitlePointerDown}
             onDoubleClick={() => {
@@ -308,7 +298,11 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
             }}
           >
             {isCompact ? (
-              <button
+              <>
+                <h2 id={titleId} className="sr-only">
+                  {managed.title}
+                </h2>
+                <button
                 type="button"
                 className="os-window__back"
                 aria-label={`Close ${managed.title}`}
@@ -331,6 +325,7 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
+              </>
             ) : (
               <>
                 <div
@@ -353,25 +348,24 @@ export function WindowFrame({ window: managed, children }: WindowFrameProps) {
                     type="button"
                     className="os-window__control os-window__control--maximize"
                     aria-label={
-                      managed.isMaximized
-                        ? `Restore ${managed.title}`
-                        : `Maximize ${managed.title}`
+                      managed.isMaximized ? `Restore ${managed.title}` : `Maximize ${managed.title}`
                     }
                     onClick={() => {
                       if (!isCompact) handleMaximize();
                     }}
                   />
                 </div>
-                <h2 className="os-window__title">{managed.title}</h2>
-                <span
-                  className="os-window__titlebar-spacer"
-                  aria-hidden="true"
-                />
+                <h2 id={titleId} className="os-window__title">
+                  {managed.title}
+                </h2>
+                <span className="os-window__titlebar-spacer" aria-hidden="true" />
               </>
             )}
           </div>
         ) : null}
-        <div className="os-window__body">{children}</div>
+        <div className="os-window__body">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </div>
       </section>
     </div>
   );

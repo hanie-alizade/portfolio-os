@@ -1,6 +1,3 @@
-"use client";
-
-import Image from "next/image";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 import { useMenuBar } from "@/components/os/MenuBarContext";
 import { getDisplayedYearsOfExperience } from "@/lib/experience";
@@ -28,12 +25,11 @@ export function AboutWindowContent() {
           </h3>
           <div className="flex flex-col gap-1">
             <p className="os-window-copy">
-              Senior Frontend Engineer with {years}+ years building production
-              interfaces.
+              Senior Frontend Engineer with {years}+ years building production interfaces.
             </p>
             <p className="os-window-copy">
-              From logistics dashboards handling 1,000+ orders a day, to wallet
-              & transaction flows, enterprise platforms, and healthcare tools.
+              From logistics dashboards handling 1,000+ orders a day, to wallet & transaction flows,
+              enterprise platforms, and healthcare tools.
             </p>
           </div>
         </div>
@@ -43,19 +39,13 @@ export function AboutWindowContent() {
               <span
                 key={highlight.label}
                 className="os-chip"
-                style={
-                  { "--chip-accent": highlight.accent } as React.CSSProperties
-                }
+                style={{ "--chip-accent": highlight.accent } as React.CSSProperties}
               >
                 {highlight.label}
               </span>
             ))}
           </div>
-          <button
-            type="button"
-            className="os-link"
-            onClick={() => openMenu("skills")}
-          >
+          <button type="button" className="os-link" onClick={() => openMenu("skills")}>
             + full stack in the Skills menu ↗
           </button>
         </div>
@@ -78,13 +68,14 @@ export function AboutWindowContent() {
       </div>
 
       <div className="os-window-content__media os-window-content__media--plain">
-        <Image
-          src="/os/about-desktop.png"
+        <img
+          src="/os/about-desktop.webp"
           alt="Abstract geometric network visualization"
           width={1536}
           height={1024}
           className="os-window-media-image"
           loading="lazy"
+          decoding="async"
         />
       </div>
     </div>

@@ -1,14 +1,5 @@
-"use client";
-
 import { useRef, useState } from "react";
-import Image from "next/image";
-import {
-  useMotionValue,
-  useSpring,
-  useTransform,
-  motion,
-  type MotionValue,
-} from "motion/react";
+import { useMotionValue, useSpring, useTransform, motion, type MotionValue } from "motion/react";
 import { useWindowManager } from "@/components/os/window/WindowManagerContext";
 import type { DockApp } from "./dockApps";
 import { dockApps } from "./dockApps";
@@ -43,11 +34,7 @@ function DockIcon({
     return val - iconCenter;
   });
 
-  const scaleTarget = useTransform(
-    distance,
-    [-100, 0, 100],
-    [1, MAX_SIZE / BASE_SIZE, 1]
-  );
+  const scaleTarget = useTransform(distance, [-100, 0, 100], [1, MAX_SIZE / BASE_SIZE, 1]);
   const scale = useSpring(scaleTarget, {
     stiffness: 300,
     damping: 30,
@@ -72,17 +59,18 @@ function DockIcon({
           {app.label}
         </span>
         <div className="os-dock-item__icon-wrap" ref={iconRef}>
-          <Image
+          <img
             src={app.icon}
             alt=""
             width={MAX_SIZE}
             height={MAX_SIZE}
             className="os-dock-item__icon"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
         </div>
-        {isRunning ? (
-          <span className="os-dock-item__indicator" aria-hidden="true" />
-        ) : null}
+        {isRunning ? <span className="os-dock-item__indicator" aria-hidden="true" /> : null}
       </button>
     );
   }
@@ -99,24 +87,20 @@ function DockIcon({
     >
       <motion.span className="os-dock-item__tooltip" style={tooltipStyle}>
         {app.label}
-        {/* <span className="os-dock-item__tooltip-arrow" aria-hidden="true" /> */}
       </motion.span>
-      <motion.div
-        className="os-dock-item__icon-wrap"
-        style={{ scale }}
-        ref={iconRef}
-      >
-        <Image
+      <motion.div className="os-dock-item__icon-wrap" style={{ scale }} ref={iconRef}>
+        <img
           src={app.icon}
           alt=""
           width={MAX_SIZE}
           height={MAX_SIZE}
           className="os-dock-item__icon"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
       </motion.div>
-      {isRunning ? (
-        <span className="os-dock-item__indicator" aria-hidden="true" />
-      ) : null}
+      {isRunning ? <span className="os-dock-item__indicator" aria-hidden="true" /> : null}
     </button>
   );
 }
@@ -144,13 +128,11 @@ export function Dock() {
         }
       }}
     >
-      {visibleApps.map((app, index) => {
+      {visibleApps.map((app) => {
         const managed = getWindowByAppId(app.id);
         const isRunning = Boolean(managed?.isOpen);
         const isFocused =
-          Boolean(managed) &&
-          state.focusedId === managed?.id &&
-          !managed?.isMinimized;
+          Boolean(managed) && state.focusedId === managed?.id && !managed?.isMinimized;
 
         return (
           <DockIcon
